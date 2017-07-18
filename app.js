@@ -21,7 +21,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 // Use router for our routes
 routes(router);
-app.use('/api', router);
+app.use('/api/v1', router);
 
 // Send a default catch-all route
 app.get('*', (req, res) => res.status(200).send({
