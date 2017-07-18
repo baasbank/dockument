@@ -1,4 +1,4 @@
-import db from '../models';
+const db = require('../models');
 // import ControllerHelper from '../helpers/ControllerHelper';
 
 const User = db.User;
@@ -21,35 +21,23 @@ class usersController {
    * @returns {number} status - Status code
    * @memberOf UsersController
    */
-  // static login(req, res) {
-  //   const query = {
-  //     where: { email: req.body.email },
-  //   };
-  //   User.findOne(query)
-  //     .then((user) => {
-  //       if (!req.body.password) {
-  //         return res.status(200)
-  //           .send({ message: 'Invalid login credentials. Try again!' });
-  //       }
-  //       if (user && user.validatePassword(req.body.password)) {
-  //         const token = jwt
-  //           .sign({
-  //             userId: user.id,
-  //             roleType: user.roleType,
-  //             user: user.name,
-  //             email: user.email,
-  //           },
-  //           secret, { expiresIn: '12 hours' });
-  //         return res.status(200).send({
-  //           token,
-  //           userId: user.id,
-  //           roleType: user.roleType,
-  //         });
-  //       }
-  //       res.status(200)
-  //         .send({ message: 'Invalid login credentials. Try again!' });
-  //     });
-  // }
+  static login(req, res) {
+    User.findOne({ where: { email: req.body.email } })
+      .then((user) => {
+        if (!req.body.password) {
+          return res.status(200)
+            .send({ message: 'Invalid login credentials. Try again!' });
+        }
+        if (user) {
+          return res.status(200).send({
+            userId: user.id,
+            roleType: user.roleType,
+          });
+        }
+        res.status(200)
+          .send({ message: 'Invalid login credentials. Try again!' });
+      });
+  }
 
   // /**
   //  * Logout a user
@@ -87,25 +75,18 @@ class usersController {
         req.body.email &&
         req.body.password) {
           User.create({
-            name: req.body.name,
+            fullName: req.body.name,
             email: req.body.email,
             password: req.body.password,
             roleType: 'user',
           })
             .then((user) => {
-              const token = jwt
-                .sign({ userId: user.id,
-                  roleType: user.roleType,
-                  user: user.name,
-                  email: user.email, },
-                secret, { expiresIn: '12 hours' });
-              res.status(201).send({ token,
+              res.status(201).send({
                 user: {
                   id: user.id,
                   name: user.name,
                   email: user.email,
                   roleType: user.roleType,
-                  roleTitle: 'regular',
                 },
               });
             })
@@ -121,4 +102,4 @@ class usersController {
   }
 }
 
-export default usersController;
+module.exports = usersController;
