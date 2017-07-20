@@ -2,21 +2,21 @@ const UsersController = require('../controllers/usersController');
 // import UsersAuthentication from '../middlewares/UsersAuthentication';
 
 /**
- * Define roles routes
+ * Define user routes
  * @param {function} router
  * @returns {void}
  */
 const usersRoute = (router) => {
-  // Create a new role
+  // Create a new user, and get all users
   router.route('/users/')
     .post(UsersController.createUser)
-    .get(UsersController.listUsers);
+    .get(UsersController.getAllUsers);
 
   router.route('/users/login')
     .post(UsersController.login);
 
-  router.route('/users/')
-    .get(UsersController.getAllUsers);
+  router.route('/users/:id')
+    .get(UsersController.findAUser);
 };
 
 module.exports = usersRoute;

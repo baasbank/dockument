@@ -9,7 +9,7 @@ const User = db.User;
 /**
  * UsersController class to create and manage users
  *
- * @class UsersController
+ * @class usersController
  */
 class usersController {
 /**
@@ -19,7 +19,7 @@ class usersController {
    * @param {Object} req - Request object
    * @param {Object} res - Response object
    * @returns {number} status - Status code
-   * @memberOf UsersController
+   * @memberOf usersController
    */
   static createUser(req, res) {
     User.findOne({ where: { email: req.body.email } })
@@ -66,7 +66,7 @@ class usersController {
    * @param {Object} req - Request object
    * @param {Object} res - Response object
    * @returns {number} status - Status code
-   * @memberOf UsersController
+   * @memberOf usersController
    */
   static login(req, res) {
     User.findOne({ where: { email: req.body.email } })
@@ -93,39 +93,11 @@ class usersController {
    * @param {Object} req - Request object
    * @param {Object} res - Response object
    * @returns {void}
-   * @memberOf UsersController
+   * @memberOf usersController
    */
   static logout(req, res) {
     res.status(200)
       .send({ message: 'User logged out successfully' });
-  }
-
-  /**
-   * List all users
-   * @static
-   * @param {Object} req - Request object
-   * @param {Object} res - Response object
-   * @returns {number} status - Status code
-   * @memberOf UsersController
-   */
-  static getAllUsers(req, res) {
-    User.findAll()
-      .then((users) => {
-        res.status(200).send(
-          users.map((user) => {
-            return (
-              {
-                name: user.fullName,
-                email: user.email,
-                role: user.roleType,
-              }
-            );
-          })
-        );
-      })
-      .catch(() => res.status(400).send({
-        message: 'An error occured.',
-      }));
   }
   /**
    * List all users
@@ -136,19 +108,66 @@ class usersController {
    *@returns {void}
    * @memberOf UsersController
    */
-  static listUsers(req, res) {
-    const query = {};
-    query.limit = (req.query.limit > 0) ? req.query.limit : 5;
-    query.offset = (req.query.offset > 0) ? req.query.offset : 0;
-    User
-      .findAndCountAll(query)
-      .then((users) => {
-        const pagination = Helper.pagination(
-          query.limit, query.offset, users.count
-        );
-        res.status(200).send({
-          pagination, users: users.rows,
+  static getAllUsers(req, res) {
+    if ((!req.query.limit) && (!req.query.offset)) {
+      User.findAll()
+        .then((users) => {
+          res.status(200).send(
+            users.map((user) => {
+              return (
+                {
+                  name: user.fullName,
+                  email: user.email,
+                  role: user.roleType,
+                }
+              );
+            })
+          );
+        })
+        .catch(() => res.status(400).send({
+          message: 'An error occured.',
+        }));
+    } else {
+      const query = {};
+      query.limit = req.query.limit;
+      query.offset = req.query.offset || 0;
+      User
+        .findAndCountAll(query)
+        .then((users) => {
+          const pagination = Helper.pagination(
+            query.limit, query.offset, users.count
+          );
+          res.status(200).send({
+            pagination, users: users.rows,
+          });
         });
+    }
+  }
+  /**
+   * Find a user by ID
+   *
+   * @static
+   * @param {Object} req - Request object
+   * @param {Object} res - Response object
+   *@returns {void}
+   * @memberOf UsersController
+   */
+  static findAUser(req, res) {
+    return User
+      .findById(req.params.id)
+      .then((user) => {
+        if (!user) {
+          throw new Error('Cannot find user.');
+        }
+        return res.status(200).send({
+          name: user.fullName,
+          email: user.email,
+          role: user.roleType,
+        });
+      })
+      .catch((error) => {
+        const errorMessage = error.message || error;
+        res.status(400).send(errorMessage);
       });
   }
 }
