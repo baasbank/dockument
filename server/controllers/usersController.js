@@ -12,6 +12,53 @@ const User = db.User;
  * @class UsersController
  */
 class usersController {
+/**
+   * Create a user
+   *
+   * @static
+   * @param {Object} req - Request object
+   * @param {Object} res - Response object
+   * @returns {number} status - Status code
+   * @memberOf UsersController
+   */
+  static createUser(req, res) {
+    User.findOne({ where: { email: req.body.email } })
+      .then((existingUser) => {
+        if (existingUser) {
+          return res.status(200).send({
+            message: 'User already exists!',
+          });
+        }
+        if (req.body.name &&
+        req.body.email &&
+        req.body.password) {
+          User.create({
+            fullName: req.body.name,
+            email: req.body.email,
+            password: req.body.password,
+            roleType: 'regular user',
+          })
+            .then((user) => {
+              res.status(201).send({
+                user: {
+                  id: user.id,
+                  name: user.name,
+                  email: user.email,
+                  roleType: user.roleType,
+                },
+              });
+            })
+            .catch(() => res.status(400).send({
+              message: 'An error occured. Invalid parameters, try again!',
+            }));
+        } else {
+          return res.status(200).send({
+            message: 'All fields are required.'
+          });
+        }
+      });
+  }
+
   /**
    * Login a user
    *
@@ -39,65 +86,42 @@ class usersController {
       });
   }
 
-  // /**
-  //  * Logout a user
-  //  *
-  //  * @static
-  //  * @param {Object} req - Request object
-  //  * @param {Object} res - Response object
-  //  * @returns {number} status - Status code
-  //  * @memberOf UsersController
-  //  */
-  // static logout(req, res) {
-  //   res.status(200)
-  //     .send({ message: 'Successfully logged out!' });
-  // }
-
+  /**
+   * Logout a user
+   *
+   * @static
+   * @param {Object} req - Request object
+   * @param {Object} res - Response object
+   * @returns {void}
+   * @memberOf UsersController
+   */
+  static logout(req, res) {
+    res.status(200)
+      .send({ message: 'User logged out successfully' });
+  }
 
   /**
-   * Create a user
-   *
+   * List all users
    * @static
    * @param {Object} req - Request object
    * @param {Object} res - Response object
    * @returns {number} status - Status code
    * @memberOf UsersController
    */
-  static createUser(req, res) {
-    User.findOne({ where: { email: req.body.email } })
-      .then((existingUser) => {
-        if (existingUser) {
-          return res.status(200).send({
-            message: 'User already exists!',
-          });
-        }
-        if (req.body.name &&
-        req.body.email &&
-        req.body.password) {
-          User.create({
-            fullName: req.body.name,
-            email: req.body.email,
-            password: req.body.password,
-            roleType: 'user',
+  static getAllUsers(req, res) {
+    User.findAll()
+      .then((users) => {
+        res.status(200).send(
+          users.map((user) => {
+            return (
+              {
+                name: user.fullName,
+                email: user.email,
+                role: user.roleType,
+              }
+            );
           })
-            .then((user) => {
-              res.status(201).send({
-                user: {
-                  id: user.id,
-                  name: user.name,
-                  email: user.email,
-                  roleType: user.roleType,
-                },
-              });
-            })
-            .catch(() => res.status(400).send({
-              message: 'An error occured. Invalid parameters, try again!',
-            }));
-        } else {
-          return res.status(200).send({
-            message: 'All fields are required.'
-          });
-        }
+        );
       });
   }
 }
