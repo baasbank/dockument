@@ -9,7 +9,8 @@ const UsersController = require('../controllers/usersController');
 const usersRoute = (router) => {
   // Create a new role
   router.route('/users/')
-    .post(UsersController.createUser);
+    .post(UsersController.createUser)
+    .get(UsersController.listUsers);
 
   router.route('/users/login')
     .post(UsersController.login);

@@ -1,5 +1,5 @@
 const db = require('../models');
-// import ControllerHelper from '../helpers/ControllerHelper';
+const Helper = require('../helper/Helper');
 
 const User = db.User;
 // const Role = db.Role;
@@ -122,6 +122,33 @@ class usersController {
             );
           })
         );
+      })
+      .catch(() => res.status(400).send({
+        message: 'An error occured.',
+      }));
+  }
+  /**
+   * List all users
+   *
+   * @static
+   * @param {Object} req - Request object
+   * @param {Object} res - Response object
+   *@returns {void}
+   * @memberOf UsersController
+   */
+  static listUsers(req, res) {
+    const query = {};
+    query.limit = (req.query.limit > 0) ? req.query.limit : 5;
+    query.offset = (req.query.offset > 0) ? req.query.offset : 0;
+    User
+      .findAndCountAll(query)
+      .then((users) => {
+        const pagination = Helper.pagination(
+          query.limit, query.offset, users.count
+        );
+        res.status(200).send({
+          pagination, users: users.rows,
+        });
       });
   }
 }
