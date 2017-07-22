@@ -8,7 +8,8 @@ const DocumentsController = require('../controllers/documentsController');
 const documentsRoute = (router) => {
   // Create a new user, and get all users
   router.route('/documents/')
-    .post(DocumentsController.createDocument);
+    .post(DocumentsController.createDocument)
+    .get(DocumentsController.getAllDocuments);
 };
 
 module.exports = documentsRoute;

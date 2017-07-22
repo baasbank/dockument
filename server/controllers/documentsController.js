@@ -1,4 +1,5 @@
 const db = require('../models');
+const Helper = require('../helper/Helper');
 
 const Document = db.Document;
 
@@ -36,6 +37,52 @@ class documentsController {
       return res.status(206).send({
         message: 'All fields are required.'
       });
+    }
+  }
+
+  /**
+   * List all users
+   *
+   * @static
+   * @param {Object} req - Request object
+   * @param {Object} res - Response object
+   *@returns {void}
+   * @memberOf UsersController
+   */
+  static getAllDocuments(req, res) {
+    if ((!req.query.limit) && (!req.query.offset)) {
+      Document.findAll()
+        .then((documents) => {
+          res.status(200).send(
+            documents.map((document) => {
+              return (
+                {
+                  title: document.title,
+                  content: document.content,
+                  access: document.accessType,
+                  userId: document.UserId,
+                }
+              );
+            })
+          );
+        })
+        .catch(() => res.status(400).send({
+          message: 'An error occured.',
+        }));
+    } else {
+      const query = {};
+      query.limit = req.query.limit;
+      query.offset = req.query.offset || 0;
+      Document
+        .findAndCountAll(query)
+        .then((documents) => {
+          const pagination = Helper.pagination(
+            query.limit, query.offset, documents.count
+          );
+          res.status(200).send({
+            pagination, documents: documents.rows,
+          });
+        });
     }
   }
 }
