@@ -170,6 +170,43 @@ class usersController {
         res.status(400).send(errorMessage);
       });
   }
+
+  /**
+   * Update a user
+   *
+   * @static
+   * @param {Object} req - Request object
+   * @param {Object} res - Response object
+   * @returns {void}
+   * @memberOf UsersController
+   */
+  static updateUser(req, res) {
+    User
+      .findById(req.params.id)
+      .then((user) => {
+        if (!user) {
+          return res.status(404).send({
+            message: 'User does not exist',
+          });
+        }
+        user
+          .update({
+            fullName: req.body.name || user.fullName,
+            email: req.body.email || user.email,
+            password: req.body.password || user.password,
+          })
+          .then(() => res.status(200).send({
+            message: 'Update Successful!',
+            user,
+          }))
+          .catch(() => res.status(400).send({
+            message: 'An error occured. Please try again!',
+          }));
+      })
+      .catch(() => res.status(400).send({
+        message: 'An error occured. Please try again!',
+      }));
+  }
 }
 
 module.exports = usersController;

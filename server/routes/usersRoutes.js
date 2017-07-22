@@ -16,7 +16,9 @@ const usersRoute = (router) => {
     .post(UsersController.login);
 
   router.route('/users/:id')
-    .get(UsersController.findAUser);
+    .get(UsersController.findAUser)
+    .put(UsersController.updateUser);
+  // .delete(UsersController.deleteAUser);
 };
 
 module.exports = usersRoute;
