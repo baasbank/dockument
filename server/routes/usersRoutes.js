@@ -17,8 +17,8 @@ const usersRoute = (router) => {
 
   router.route('/users/:id')
     .get(UsersController.findAUser)
-    .put(UsersController.updateUser);
-  // .delete(UsersController.deleteAUser);
+    .put(UsersController.updateUser)
+    .delete(UsersController.deleteAUser);
 };
 
 module.exports = usersRoute;

@@ -207,6 +207,33 @@ class usersController {
         message: 'An error occured. Please try again!',
       }));
   }
+
+  /**
+    * Delete a user by id
+    * Route: DELETE: /users/:id
+    * @param {Object} req request object
+    * @param {Object} res response object
+    * @returns {void} no returns
+    */
+  static deleteAUser(req, res) {
+    User
+      .findById(req.params.id)
+      .then((user) => {
+        if (!user) {
+          return res.status(404).send({
+            message: 'User does not exist',
+          });
+        }
+        user
+          .destroy()
+          .then(() => res.status(200).send({
+            message: 'User deleted successfully.',
+          }));
+      })
+      .catch(() => res.status(400).send({
+        message: 'An error occured. Please try again',
+      }));
+  }
 }
 
 module.exports = usersController;
