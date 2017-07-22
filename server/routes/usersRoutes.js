@@ -19,6 +19,9 @@ const usersRoute = (router) => {
     .get(UsersController.findAUser)
     .put(UsersController.updateUser)
     .delete(UsersController.deleteAUser);
+
+  router.route('/search/users/')
+    .get(UsersController.searchUsers);
 };
 
 module.exports = usersRoute;

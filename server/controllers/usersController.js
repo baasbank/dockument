@@ -234,6 +234,52 @@ class usersController {
         message: 'An error occured. Please try again',
       }));
   }
+
+  /**
+   * Gets all users relevant to search query
+   *
+   * @static
+   * @param {Object} req - Request object
+   * @param {Object} res - Response object
+   * @returns {string} - Returns response object
+   *
+   * @memberOf usersController
+   */
+  static searchUsers(req, res) {
+    const searchTerm = req.query.search.trim();
+
+    const query = {
+      where: {
+        $or: [{
+          fullName: {
+            $iLike: `%${searchTerm}%`,
+          },
+          email: {
+            $iLike: `%${searchTerm}%`,
+          },
+        }],
+      },
+    };
+
+    query.limit = (req.query.limit > 0) ? req.query.limit : 10;
+    query.offset = (req.query.offset > 0) ? req.query.offset : 0;
+    query.order = ['createdAt'];
+    User
+      .findAndCountAll(query)
+      .then((users) => {
+        const pagination = Helper.pagination(
+          query.limit, query.offset, users.count
+        );
+        if (!users.rows.length) {
+          return res.status(200).send({
+            message: 'Search term does not match any user',
+          });
+        }
+        res.status(200).send({
+          pagination, users: users.rows,
+        });
+      });
+  }
 }
 
 module.exports = usersController;
