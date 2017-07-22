@@ -153,6 +153,33 @@ class documentsController {
         message: 'An error occured. Please try again!',
       }));
   }
+
+  /**
+    * Delete a document by id
+    * Route: DELETE: /document/:id
+    * @param {Object} req request object
+    * @param {Object} res response object
+    * @returns {void} no returns
+    */
+  static deleteADocument(req, res) {
+    Document
+      .findById(req.params.id)
+      .then((document) => {
+        if (!document) {
+          return res.status(404).send({
+            message: 'Document does not exist',
+          });
+        }
+        document
+          .destroy()
+          .then(() => res.status(200).send({
+            message: 'Document deleted successfully.',
+          }));
+      })
+      .catch(() => res.status(400).send({
+        message: 'An error occured. Please try again',
+      }));
+  }
 }
 
 module.exports = documentsController;

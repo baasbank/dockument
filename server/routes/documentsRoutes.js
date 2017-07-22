@@ -14,7 +14,8 @@ const documentsRoute = (router) => {
   // get or update document by its ID
   router.route('/documents/:id')
     .get(DocumentsController.findADocument)
-    .put(DocumentsController.updateDocument);
+    .put(DocumentsController.updateDocument)
+    .delete(DocumentsController.deleteADocument);
 };
 
 module.exports = documentsRoute;
