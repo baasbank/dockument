@@ -1,9 +1,6 @@
-import db from '../models';
-// import ControllerHelper from '../helpers/ControllerHelper';
+const db = require('../models');
 
-// const Role = db.Role;
 const Document = db.Document;
-// const User = db.User;
 
 /**
  *
@@ -22,17 +19,18 @@ class documentsController {
   static createDocument(req, res) {
     if (req.body.title &&
         req.body.content &&
-        req.body.accessType) {
+        req.body.accessType &&
+        req.body.userId) {
       Document
         .create({
           title: req.body.title,
           content: req.body.content,
           accessType: req.body.access,
-          UserId: req.decoded.userId,
+          UserId: req.body.userId,
         })
         .then(document => res.status(201).send(document))
         .catch(() => res.status(400).send({
-          message: 'An error occured. Invalid parameters, try again!',
+          message: 'An error occured. Please try again!',
         }));
     } else {
       return res.status(206).send({
@@ -42,4 +40,4 @@ class documentsController {
   }
 }
 
-export default documentsController;
+module.exports = documentsController;
