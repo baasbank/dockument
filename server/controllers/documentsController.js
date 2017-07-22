@@ -85,6 +85,36 @@ class documentsController {
         });
     }
   }
+
+  /**
+   * Find a document by ID
+   *
+   * @static
+   * @param {Object} req - Request object
+   * @param {Object} res - Response object
+   *@returns {void}
+   * @memberOf DocumentsController
+   */
+  static findADocument(req, res) {
+    return Document
+      .findById(req.params.id)
+      .then((document) => {
+        if (!document) {
+          throw new Error('Cannot find document.');
+        }
+        return res.status(200).send({
+          documentId: document.id,
+          title: document.title,
+          content: document.content,
+          access: document.accessType,
+          ownerId: document.UserId,
+        });
+      })
+      .catch((error) => {
+        const errorMessage = error.message || error;
+        res.status(400).send(errorMessage);
+      });
+  }
 }
 
 module.exports = documentsController;
