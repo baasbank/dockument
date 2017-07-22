@@ -10,6 +10,10 @@ const documentsRoute = (router) => {
   router.route('/documents/')
     .post(DocumentsController.createDocument)
     .get(DocumentsController.getAllDocuments);
+
+  // get a document by its ID
+  router.route('/documents/:id')
+    .get(DocumentsController.findADocument);
 };
 
 module.exports = documentsRoute;
