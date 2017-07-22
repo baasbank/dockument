@@ -115,6 +115,44 @@ class documentsController {
         res.status(400).send(errorMessage);
       });
   }
+
+  /**
+   * Update a document
+   *
+   * @static
+   * @param {Object} req - Request object
+   * @param {Object} res - Response object
+   * @returns {void}
+   * @memberOf DocumentsController
+   */
+  static updateDocument(req, res) {
+    Document
+      .findById(req.params.id)
+      .then((document) => {
+        if (!document) {
+          return res.status(404).send({
+            message: 'Cannot find document',
+          });
+        }
+        document
+          .update({
+            title: req.body.title || document.title,
+            content: req.body.content || document.content,
+            access: req.body.accessType || document.accessType,
+            userId: document.UserId,
+          })
+          .then(() => res.status(200).send({
+            message: 'Update Successful!',
+            document,
+          }))
+          .catch(() => res.status(400).send({
+            message: 'An error occured. Please try again!',
+          }));
+      })
+      .catch(() => res.status(400).send({
+        message: 'An error occured. Please try again!',
+      }));
+  }
 }
 
 module.exports = documentsController;

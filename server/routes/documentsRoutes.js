@@ -11,9 +11,10 @@ const documentsRoute = (router) => {
     .post(DocumentsController.createDocument)
     .get(DocumentsController.getAllDocuments);
 
-  // get a document by its ID
+  // get or update document by its ID
   router.route('/documents/:id')
-    .get(DocumentsController.findADocument);
+    .get(DocumentsController.findADocument)
+    .put(DocumentsController.updateDocument);
 };
 
 module.exports = documentsRoute;
