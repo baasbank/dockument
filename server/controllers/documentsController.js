@@ -180,6 +180,48 @@ class documentsController {
         message: 'An error occured. Please try again',
       }));
   }
+
+  /**
+   * Gets all documents relevant to search query
+   *
+   * @static
+   * @param {Object} req - Request object
+   * @param {Object} res - Response object
+   * @returns {string} - Returns response object
+   *
+   * @memberOf documentsController
+   */
+  static searchDocuments(req, res) {
+    const searchTerm = req.query.search.trim();
+
+    const query = {
+      where: {
+        $or: [{
+          title: {
+            $iLike: `%${searchTerm}%`,
+          },
+        }],
+      },
+    };
+
+    query.limit = (req.query.limit > 0) ? req.query.limit : 10;
+    query.offset = (req.query.offset > 0) ? req.query.offset : 0;
+    Document
+      .findAndCountAll(query)
+      .then((documents) => {
+        const pagination = Helper.pagination(
+          query.limit, query.offset, documents.count
+        );
+        if (!documents.rows.length) {
+          return res.status(200).send({
+            message: 'Search term does not match any document',
+          });
+        }
+        res.status(200).send({
+          pagination, documents: documents.rows,
+        });
+      });
+  }
 }
 
 module.exports = documentsController;
