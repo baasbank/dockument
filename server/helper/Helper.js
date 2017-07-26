@@ -1,7 +1,7 @@
 /**
- * Helpers class for Controllers
+ * Controllers helper class
  *
- * @class ControllerHelper
+ * @class Helper
  */
 class Helper {
   /**

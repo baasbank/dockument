@@ -1,4 +1,6 @@
 const DocumentsController = require('../controllers/documentsController');
+const authenticate = require('../middleware/authenticate');
+
 
 /**
  * Define document routes
@@ -8,17 +10,20 @@ const DocumentsController = require('../controllers/documentsController');
 const documentsRoute = (router) => {
   // Create a new user, and get all users
   router.route('/documents/')
-    .post(DocumentsController.createDocument)
-    .get(DocumentsController.getAllDocuments);
+    .post(authenticate.verifyToken, DocumentsController.createDocument)
+    .get(authenticate.verifyToken,
+      authenticate.hasAdminAccess,
+      DocumentsController.getAllDocuments);
 
-  // get or update document by its ID
+  // get, update, and delete a document by its ID
   router.route('/documents/:id')
-    .get(DocumentsController.findADocument)
-    .put(DocumentsController.updateDocument)
-    .delete(DocumentsController.deleteADocument);
+    .get(authenticate.verifyToken, DocumentsController.findADocument)
+    .put(authenticate.verifyToken, DocumentsController.updateDocument)
+    .delete(authenticate.verifyToken, DocumentsController.deleteADocument);
 
+  // search for documents
   router.route('/search/documents')
-    .get(DocumentsController.searchDocuments);
+    .get(authenticate.verifyToken, DocumentsController.searchDocuments);
 };
 
 module.exports = documentsRoute;

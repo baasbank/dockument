@@ -4,18 +4,17 @@ const Helper = require('../helper/Helper');
 const Document = db.Document;
 
 /**
- *
- * DocumentsController class to create and manage documents
- * @class DocumentsController
+ * class to create and manage documents
+ * @class documentsController
  */
 class documentsController {
   /**
-   * Create a new Document
+   * create a new document
    * @static
    * @param {Object} req - Request object
    * @param {Object} res - Response object
-   * @returns {void}
-   * @memberOf DocumentsController
+   * @returns {object} json - payload
+   * @memberOf documentsController
    */
   static createDocument(req, res) {
     if (req.body.title &&
@@ -26,12 +25,12 @@ class documentsController {
         .create({
           title: req.body.title,
           content: req.body.content,
-          accessType: req.body.access,
+          accessType: req.body.accessType,
           UserId: req.body.userId,
         })
         .then(document => res.status(201).send(document))
         .catch(() => res.status(400).send({
-          message: 'An error occured. Please try again!',
+          message: 'Error. Please try again.',
         }));
     } else {
       return res.status(206).send({
@@ -41,13 +40,13 @@ class documentsController {
   }
 
   /**
-   * List all users
+   * get all users
    *
    * @static
    * @param {Object} req - Request object
    * @param {Object} res - Response object
-   *@returns {void}
-   * @memberOf UsersController
+   *@returns {object} json - payload
+   * @memberOf documentsController
    */
   static getAllDocuments(req, res) {
     if ((!req.query.limit) && (!req.query.offset)) {
@@ -92,15 +91,26 @@ class documentsController {
    * @static
    * @param {Object} req - Request object
    * @param {Object} res - Response object
-   *@returns {void}
-   * @memberOf DocumentsController
+   *@returns {object} json - payload
+   * @memberOf documentsController
    */
   static findADocument(req, res) {
     return Document
       .findById(req.params.id)
       .then((document) => {
         if (!document) {
-          throw new Error('Cannot find document.');
+          throw new Error('Document does not exist.');
+        }
+        if (document.accessType === 'private' && req.decoded.userId !== req.params.id) {
+          return res.status(403).send({
+            message: 'You do not have access to this document'
+          });
+        }
+
+        if (document.accessType === 'role' && (req.decoded.roleType !== 'super user' || req.decoded.roleType !== 'admin')) {
+          return res.status(403).send({
+            message: 'You do not have access to this document'
+          });
         }
         return res.status(200).send({
           documentId: document.id,
@@ -117,13 +127,13 @@ class documentsController {
   }
 
   /**
-   * Update a document
+   * update a document
    *
    * @static
    * @param {Object} req - Request object
    * @param {Object} res - Response object
-   * @returns {void}
-   * @memberOf DocumentsController
+   * @returns {object} json - payload
+   * @memberOf documentsController
    */
   static updateDocument(req, res) {
     Document
@@ -132,6 +142,25 @@ class documentsController {
         if (!document) {
           return res.status(404).send({
             message: 'Cannot find document',
+          });
+        }
+        if (req.decoded.userId !== document.UserId) {
+          return res.status(403).send({
+            message: 'You can update only your documents.'
+          });
+        }
+
+        if (req.body.id) {
+          return res.status(403).send({
+            message:
+            'Document ID cannot be changed.',
+          });
+        }
+
+        if (req.body.UserId) {
+          return res.status(403).send({
+            message:
+            'User ID cannot be changed.',
           });
         }
         document
@@ -146,20 +175,21 @@ class documentsController {
             document,
           }))
           .catch(() => res.status(400).send({
-            message: 'An error occured. Please try again!',
+            message: 'Error. Please try again.',
           }));
       })
       .catch(() => res.status(400).send({
-        message: 'An error occured. Please try again!',
+        message: 'Error. Please try again.',
       }));
   }
 
   /**
-    * Delete a document by id
-    * Route: DELETE: /document/:id
+    * delete a document by id
+    * @static 
     * @param {Object} req request object
     * @param {Object} res response object
-    * @returns {void} no returns
+    * @returns {object} json - payload
+    * @memberOf documentsController
     */
   static deleteADocument(req, res) {
     Document
@@ -167,7 +197,13 @@ class documentsController {
       .then((document) => {
         if (!document) {
           return res.status(404).send({
-            message: 'Document does not exist',
+            message: 'Document does not exist.',
+          });
+        }
+
+        if (req.decoded.userId !== document.UserId) {
+          return res.status(403).send({
+            message: 'You can delete only your documents.'
           });
         }
         document
@@ -177,17 +213,16 @@ class documentsController {
           }));
       })
       .catch(() => res.status(400).send({
-        message: 'An error occured. Please try again',
+        message: 'Error. Please try again.',
       }));
   }
 
   /**
-   * Gets all documents relevant to search query
-   *
+   * get all documents
    * @static
    * @param {Object} req - Request object
    * @param {Object} res - Response object
-   * @returns {string} - Returns response object
+   * @returns {object} json - payload
    *
    * @memberOf documentsController
    */
@@ -204,7 +239,7 @@ class documentsController {
       },
     };
 
-    query.limit = (req.query.limit > 0) ? req.query.limit : 10;
+    query.limit = (req.query.limit > 0) ? req.query.limit : 5;
     query.offset = (req.query.offset > 0) ? req.query.offset : 0;
     Document
       .findAndCountAll(query)

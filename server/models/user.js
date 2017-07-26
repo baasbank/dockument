@@ -28,8 +28,7 @@ module.exports = (sequelize, DataTypes) => {
       validate: {
         notEmpty: {
           message: 'Password field cannot be empty.',
-        },
-        len: [4, 20],
+        }
       },
     },
     roleType: {
