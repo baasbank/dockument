@@ -11,6 +11,7 @@ const http = require('http');
 const app = express();
 
 const router = express.Router();
+require('dotenv').config();
 
 // Log requests to the console.
 app.use(logger('dev'));
@@ -25,7 +26,7 @@ app.use('/api/v1', router);
 
 // Send a default catch-all route
 app.get('*', (req, res) => res.status(200).send({
-  message: 'Welcome to my greatness.',
+  message: 'Error. Please check URL and try again.',
 }));
 
 const port = parseInt(process.env.PORT, 10) || 8000;
