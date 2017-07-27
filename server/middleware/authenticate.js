@@ -41,7 +41,6 @@ function verifyToken(req, res, next) {
    */
 
 function hasAdminAccess(req, res, next) {
-  console.log(req.decoded.roleType);
   if (req.decoded.roleType === 'admin') {
     next();
   } else {
