@@ -1,4 +1,5 @@
-const RolesController = require('../controllers/rolesController');
+import RolesController from '../controllers/rolesController';
+import Authenticate from '../middleware/authenticate';
 
 /**
  * Define roles routes
@@ -8,7 +9,7 @@ const RolesController = require('../controllers/rolesController');
 const rolesRoute = (router) => {
   // Create a new role
   router.route('/roles')
-    .post(RolesController.createRole);
+    .post(Authenticate.verifyToken, Authenticate.hasAdminAccess, RolesController.createRole);
 };
 
 module.exports = rolesRoute;

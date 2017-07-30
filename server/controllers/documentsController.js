@@ -28,7 +28,15 @@ class documentsController {
           accessType: req.body.accessType,
           UserId: req.body.userId,
         })
-        .then(document => res.status(201).send(document))
+        .then(document => res.status(201).send({
+          message: 'Document created.',
+          details: {
+            documentId: document.id,
+            content: document.content,
+            accessType: document.accessType,
+            ownerId: document.UserId
+          }
+        }))
         .catch(() => res.status(400).send({
           message: 'Error. Please try again.',
         }));
@@ -53,17 +61,19 @@ class documentsController {
       Document.findAll()
         .then((documents) => {
           res.status(200).send(
-            documents.map((document) => {
-              return (
-                {
-                  title: document.title,
-                  content: document.content,
-                  access: document.accessType,
-                  userId: document.UserId,
-                }
-              );
-            })
-          );
+            {
+              allDocuments:
+              documents.map((document) => {
+                return (
+                  {
+                    title: document.title,
+                    content: document.content,
+                    access: document.accessType,
+                    userId: document.UserId,
+                  }
+                );
+              })
+            });
         })
         .catch(() => res.status(400).send({
           message: 'An error occured.',
@@ -208,7 +218,7 @@ class documentsController {
         }
         document
           .destroy()
-          .then(() => res.status(200).send({
+          .then(() => res.status(410).send({
             message: 'Document deleted successfully.',
           }));
       })

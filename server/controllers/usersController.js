@@ -1,5 +1,6 @@
+import bcrypt from 'bcrypt';
+
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
 
 require('dotenv').config();
 
@@ -31,40 +32,48 @@ class usersController {
     if (req.body.name &&
         req.body.email &&
         req.body.password) {
-      bcrypt.hash(req.body.password, 10, (err, hash) => {
-        User.findOne({ where: { email: req.body.email } })
-          .then((existingUser) => {
-            if (existingUser) {
-              res.status(200).send({
-                message: 'User already exists!',
+      User.findOne({ where: { email: req.body.email } })
+        .then((existingUser) => {
+          if (existingUser) {
+            res.status(400).send({
+              message: 'User already exists!',
+            });
+          }
+          User.create({
+            fullName: req.body.name,
+            email: req.body.email,
+            password: req.body.password,
+            roleType: 'regular user'
+          })
+            .then((user) => {
+              const userData = {
+                userId: user.id,
+                fullName: user.fullName,
+                roleType: user.roleType,
+              };
+
+              const token = jwt.sign(userData, secret, {
+                expiresIn: '48h'
               });
-            } else {
-              User.create({
-                fullName: req.body.name,
-                email: req.body.email,
-                password: hash,
-                roleType: 'regular user'
-              })
-                .then((user) => {
-                  res.status(201).send({
-                    user: {
-                      id: user.id,
-                      name: user.name,
-                      email: user.email,
-                      roleType: user.roleType,
-                    },
-                  });
-                })
-                .catch(() => res.status(400).send({
-                  message: 'Error. Please try again.',
-                }));
-            }
-          }).catch((error) => {
-            res.status(400).json(error);
-          });
-      });
+              res.status(201).send({
+                message: 'signup successful',
+                user: {
+                  id: user.id,
+                  name: user.name,
+                  email: user.email,
+                  roleType: user.roleType,
+                },
+                token
+              });
+            })
+            .catch(() => res.status(400).send({
+              message: 'Error. Please try again.',
+            }));
+        }).catch((error) => {
+          res.status(400).json(error);
+        });
     } else {
-      return res.status(200).send({
+      return res.status(206).send({
         message: 'All fields are required.'
       });
     }
@@ -80,55 +89,33 @@ class usersController {
    * @memberOf usersController
    */
   static login(req, res) {
-    if (!(req.body.password) && !(req.body.email)) {
+    if (!(req.body.password) || !(req.body.email)) {
       res.status(400)
         .json({ message: 'All fields are required' });
     } else {
       User.findOne({ where: { email: req.body.email } })
         .then((user) => {
-          if (user) {
-            bcrypt.compare(req.body.password, user.password, (err, result) => {
-              if (err) throw err;
-              if (result) {
-                const userData = {
-                  userId: user.id,
-                  fullName: user.fullName,
-                  roleType: user.roleType,
-                };
+          if (user && bcrypt.compareSync(req.body.password, user.password)) {
+            const userData = {
+              userId: user.id,
+              fullName: user.fullName,
+              roleType: user.roleType,
+            };
 
-                const token = jwt.sign(userData, secret, {
-                  expiresIn: '48h'
-                });
-                res.status(201).json({
-                  message: 'login successful',
-                  token
-                });
-              } else {
-                res.status(401).json({
-                  message: 'Wrong password'
-                });
-              }
+            const token = jwt.sign(userData, secret, {
+              expiresIn: '48h'
+            });
+            res.status(201).json({
+              message: 'login successful',
+              token
             });
           } else {
-            res.status(400)
+            res.status(401)
               .send({ message: 'Invalid login credentials. Try again.' });
           }
-        });
+        })
+        .catch(error => res.status(400).send(error));
     }
-  }
-
-  /**
-   * Logout a user
-   *
-   * @static
-   * @param {Object} req - Request object
-   * @param {Object} res - Response object
-   * @returns {void}
-   * @memberOf usersController
-   */
-  static logout(req, res) {
-    res.status(200)
-      .send({ message: 'User logged out successfully' });
   }
   /**
    * List all users
@@ -144,14 +131,16 @@ class usersController {
       User.findAll()
         .then((users) => {
           res.status(200).send(
-            users.map(user => (
-              {
-                name: user.fullName,
-                email: user.email,
-                roleType: user.roleType,
-              }
-            ))
-          );
+            {
+              allUsers:
+              users.map(user => (
+                {
+                  name: user.fullName,
+                  email: user.email,
+                  roleType: user.roleType,
+                }
+              ))
+            });
         })
         .catch(() => res.status(400).send({
           message: 'An error occured.',
@@ -237,7 +226,7 @@ class usersController {
             if ((role.roleType !== 'admin') && (req.decoded.userId !== user.id)) {
               return res.status(403).send({
                 message:
-                'You do not have permission to update this property.',
+                'You do not have permission to update.',
               });
             }
             user
@@ -247,17 +236,14 @@ class usersController {
                 password: req.body.password || user.password,
                 roleType: req.body.roleType || user.roleType,
               })
-              .then(() => res.status(200).send({
+              .then(() => res.status(205).send({
                 message: 'Update Successful!',
                 user,
-              }))
-              .catch(() => res.status(400).send({
-                message: 'Error. Please try again.',
               }));
           })
-          .catch(() => res.status(400).send({
-            message: 'Error. Please try again.',
-          }));
+          .catch(() => res.status(400).send(
+            'Error. Please try again.',
+          ));
       });
   }
 
@@ -273,19 +259,19 @@ class usersController {
       .findById(req.params.id)
       .then((user) => {
         if (!user) {
-          return res.status(404).send({
+          return res.status(404).json({
             message: 'User does not exist',
           });
         }
         user
           .destroy()
-          .then(() => res.status(200).send({
+          .then(() => res.status(410).send({
             message: 'User deleted successfully.',
           }));
       })
-      .catch(() => res.status(400).send({
-        message: 'Error. Please try again',
-      }));
+      .catch(() => res.status(400).send(
+        'Error. Please try again',
+      ));
   }
 
   /**
@@ -314,7 +300,7 @@ class usersController {
       },
     };
 
-    query.limit = (req.query.limit > 0) ? req.query.limit : 10;
+    query.limit = (req.query.limit > 0) ? req.query.limit : 2;
     query.offset = (req.query.offset > 0) ? req.query.offset : 0;
     query.order = ['createdAt'];
     User
@@ -324,13 +310,14 @@ class usersController {
           query.limit, query.offset, users.count
         );
         if (!users.rows.length) {
-          return res.status(200).send({
+          return res.status(404).send({
             message: 'Search term does not match any user',
           });
+        } else {
+          res.status(200).send({
+            pagination, users: users.rows,
+          });
         }
-        res.status(200).send({
-          pagination, users: users.rows,
-        });
       });
   }
   /**
@@ -345,12 +332,7 @@ class usersController {
   static getUserDocuments(req, res) {
     const query = {
       where: {
-        $and: {
-          UserId: { $eq: req.params.id },
-          $or: {
-            accessType: { $eq: 'public' || 'role' },
-          },
-        },
+        UserId: { $eq: req.params.id },
       }
     };
     query.limit = (req.query.limit > 0) ? req.query.limit : 5;
@@ -373,7 +355,7 @@ class usersController {
           query.limit, query.offset, documents.count
         );
         if (!documents.rows.length) {
-          return res.status(200).send({
+          return res.status(404).send({
             message: 'No document matches the request.',
           });
         }
@@ -381,9 +363,9 @@ class usersController {
           pagination, documents: mappedDocuments,
         });
       })
-      .catch(() => res.status(400).send({
-        message: 'Error. Please try again.',
-      }));
+      .catch(() => res.status(400).send(
+        'Error. Please check the id and try again'
+      ));
   }
 }
 
