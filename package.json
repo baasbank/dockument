@@ -5,11 +5,14 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha --timeout 90000",
-    "start:dev": "nodemon app.js",
+    "start:dev": "nodemon --exec babel-node app.js",
     "test:db:migrate": "NODE_ENV=test sequelize db:migrate:undo:all && NODE_ENV=test sequelize db:migrate",
     "test:db:seed": "NODE_ENV=test sequelize db:seed:all",
     "start:test:db": "npm run test:db:migrate && npm run test:db:seed",
-    "server-test": "npm run start:test:db && NODE_ENV=test nyc --reporter=html --reporter=text mocha --compilers js:babel-core/register ./server/tests/**/*.js --timeout 90000"
+    "server-test": "npm run start:test:db && NODE_ENV=test nyc --reporter=html --reporter=text mocha --compilers js:babel-core/register ./server/tests/**/*.js --timeout 90000",
+    "dev:db:seed": "sequelize db:seed:all",
+    "dev:db:migrate": "sequelize db:migrate:undo:all && sequelize db:migrate",
+    "dev-server": "npm run dev:db:migrate && npm run dev:db:seed"
   },
   "repository": {
     "type": "git",
@@ -52,6 +55,7 @@
     "eslint-plugin-import": "^2.6.1",
     "istanbul": "^0.4.5",
     "mocha": "^3.4.2",
+    "node-mocks-http": "^1.6.4",
     "nodemon": "^1.11.0",
     "nyc": "^11.0.3"
   }
