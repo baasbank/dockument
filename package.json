@@ -4,14 +4,26 @@
   "description": "A full stack document management system, complete with roles and privileges.",
   "main": "index.js",
   "scripts": {
-    "start:dev": "nodemon --exec babel-node app.js",
-    "test:db:migrate": "NODE_ENV=test sequelize db:migrate:undo:all && NODE_ENV=test sequelize db:migrate",
-    "test:db:seed": "NODE_ENV=test sequelize db:seed:all",
-    "start:test:db": "npm run test:db:migrate && npm run test:db:seed",
-    "server-test": "npm run start:test:db && NODE_ENV=test nyc --reporter=html --reporter=text mocha --compilers js:babel-core/register ./server/tests/**/*.js --timeout 90000",
-    "dev:db:seed": "sequelize db:seed:all",
-    "dev:db:migrate": "sequelize db:migrate:undo:all && sequelize db:migrate",
-    "dev-server": "npm run dev:db:migrate && npm run dev:db:seed"
+    "start": "gulp production && node ./dist/app.js",
+    "dev": "node node_modules/gulp/bin/gulp",
+    "pretest": "npm run cleardb && NODE_ENV=test sequelize db:migrate && NODE_ENV=test sequelize db:seed:all",
+    "test": "NODE_ENV=test node node_modules/gulp/bin/gulp test",
+    "cleardb": "NODE_ENV=test sequelize db:migrate:undo:all"
+  },
+  "nyc": {
+    "require": [
+      "babel-register"
+    ],
+    "reporter": [
+      "lcov",
+      "text",
+      "html"
+    ],
+    "sourceMap": false,
+    "instrument": false,
+    "exclude": [
+      "server/test"
+    ]
   },
   "repository": {
     "type": "git",
@@ -28,17 +40,24 @@
   },
   "homepage": "https://github.com/baasbank/dockument#readme",
   "dependencies": {
+    "babel-cli": "^6.24.1",
     "babel-core": "^6.25.0",
     "babel-eslint": "^7.2.3",
     "babel-loader": "^7.1.1",
     "babel-plugin-istanbul": "^4.1.4",
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-stage-0": "^6.24.1",
+    "babel-register": "^6.24.1",
     "bcrypt": "^1.0.2",
     "body-parser": "^1.17.2",
     "dotenv": "^4.0.0",
     "express": "^4.15.3",
     "faker": "^4.1.0",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^6.1.2",
+    "gulp-coveralls": "^0.1.4",
+    "gulp-load-plugins": "^1.5.0",
+    "gulp-shell": "^0.6.3",
     "jsonwebtoken": "^7.4.1",
     "morgan": "^1.8.2",
     "pg": "^6.4.0",

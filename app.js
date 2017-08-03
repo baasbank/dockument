@@ -55,7 +55,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // Use router for our routes
 routes(router);
 app.use('/api/v1', router);
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public/dockument-api')));
 
 // serve swagger
 app.get('/swagger.json', (req, res) => {
@@ -65,7 +65,7 @@ app.get('/swagger.json', (req, res) => {
 
 // Send a default catch-all route
 app.get('*', (req, res) => res.status(200).send({
-  message: 'Error. Please check URL and try again.',
+  message: 'Error. Please check and try again.',
 }));
 
 const port = parseInt(process.env.PORT, 10) || 8000;
