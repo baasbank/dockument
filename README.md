@@ -77,7 +77,7 @@ Or download or clone this repository and run it on your machine.
 * [JSON Web Token (JWT):](https://jwt.io/introduction/) JWT is an open standard that defines a compact and self-contained way for securely transmitting information between parties as a JSON object. 
 
 ## Contributing
-* Please read [here](https://github.com/andela-aanchirinah/NS-Document-Management-System/wiki/How-to-Contribute-To-NSDMS) for details on code of conduct, and the process for submitting pull requests to me.
+* Please read [here](https://github.com/baasbank/dockument/wiki/Contributing) for details on code of conduct, and the process for submitting pull requests to me.
 
 * Fork this repository by clicking the `Fork` menu item in the top right corner of this repository.
 * Go to your github account, and under your repository list, you should find this project listed.
@@ -91,7 +91,7 @@ Or download or clone this repository and run it on your machine.
 * Add your changes by running `git add filePath`, where `filePath` is path of the file(s) in which the change(s) were made.
 * Commit your changes by running `git commit -m "commit message"`.
 * Push your changes to your remote branch by running `git push origin branchName`.
-* Open a pull request to the master branch.
+* Open a pull request to the staging branch.
 
 
 ## Limitations
@@ -99,52 +99,10 @@ Or download or clone this repository and run it on your machine.
 * Users cannot sign in through social authentication.
 * There's no frontend.
 
+## Author
+* This project is authored by Baasbank Akinmuleya.
+
 ## License
 
-* This project is authored by Baasbank Akinmuleya, and is licensed for use, distribution and modification under the ISC license.
-
-
-
-
-
-
-
-
-##### How to use
-* Visit http://docgenie.herokuapp.com/ to use this app online.
-
-##### Run in Postman
-
-* Download and install Postman and check the API Documentation for the endpoints.
-
-##### API Documentation
-
-The API has routes, each dedicated to a single task that uses HTTP response codes to indicate API status and error messages.
-You can find the full API documentation here: https://andela-mharuna.github.io/slate
-
-##### Authentication
-
-* Users are assigned a token when signup or signin. This token is needed for subsequent HTTP requests to the API for authentication and can be attached as values to the header's x-acess-token or authorization key. API requests made without authentication will fail with the status code ```401: Unauthorized Access```.
-
-####### Below are the API endpoints and their functions:
-
-* EndPoint	Functionality
- - POST /auth/api/users/login : Logs a user in.
- - POST /api/users/logout :	Logs a user out.
- - POST /auth/api/users : 	Creates a new user.
- - GET /api/users	: Find matching instances of user.
- - GET /api/users/:id	Find a particular user.
- - PUT /api/users :	Update user attributes.
- - DELETE /api/users	: Delete user.
- - POST /api/documents :	Creates a new document instance.
- - GET /api/documents :	Find matching instances of documents.
- - GET /api/documents/:id :	Find a particular document.
- - PUT /api/documents :	Update document attributes.
- - DELETE /api/documents/:id	: Delete document.
- - GET /api/users/:id/documents :	Find all documents belonging to the user.
- - GET /api/search/users/:key :	Gets all users whose names match the search-key
- - GET /api/search/documents/:term	Get all documents with title and content matching the search-key
-
-
-
+* This project is licensed under the [MIT](LICENSE) license.
 
