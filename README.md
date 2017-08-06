@@ -1,4 +1,5 @@
 # dockument
+[![Build Status](https://travis-ci.org/baasbank/dockument.svg?branch=staging](https://travis-ci.org/baasbank/dockument)
 
 ## Introduction
 
