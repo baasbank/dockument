@@ -28,10 +28,9 @@ class rolesController {
           Role.create({
             roleType: req.body.roleType,
           })
-            .then(role => res.status(201).send(role))
-            .catch(() => res.status(400).send({
-              message: 'Error. Please try again!',
-            }));
+            .then(role => res.status(201).send({
+              message: 'Role created successfully',
+              role: role.roleType }));
         } else {
           return res.status(400).send({
             message: 'roleType field is required.'

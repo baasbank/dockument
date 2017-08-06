@@ -6,7 +6,7 @@ module.exports = {
     password: null,
     database: 'DMS',
     host: '127.0.0.1',
-    port: '5432',
+    port: '5444',
     dialect: 'postgres'
   },
   test: {
@@ -14,7 +14,7 @@ module.exports = {
     password: null,
     database: 'test',
     host: '127.0.0.1',
-    port: '5432',
+    port: '5444',
     dialect: 'postgres'
   },
   // test: {

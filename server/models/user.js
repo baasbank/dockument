@@ -1,3 +1,4 @@
+import bcrypt from 'bcrypt';
 
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define('User', {
@@ -5,9 +6,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
-        notEmpty: {
-          message: 'Name field cannot be empty.',
-        },
+        notEmpty: { args: true, msg: 'Name field cannot be empty.' },
         is: /^[a-z ]+$/i,
       },
     },
@@ -47,6 +46,15 @@ module.exports = (sequelize, DataTypes) => {
           onDelete: 'CASCADE',
         });
       }
+    }
+  });
+  User.beforeCreate((user) => {
+    user.email = user.email.toLowerCase();
+    user.password = bcrypt.hashSync(user.password, bcrypt.genSaltSync(10));
+  });
+  User.beforeUpdate((user) => {
+    if (user._changed.password) {
+      user.password = bcrypt.hashSync(user.password, bcrypt.genSaltSync(10));
     }
   });
   return User;

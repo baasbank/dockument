@@ -22,6 +22,14 @@ module.exports = {
       UserId: 3,
       createdAt: new Date(),
       updatedAt: new Date(),
+    },
+    {
+      title: 'My fourth document',
+      content: 'fourth lorem ipsum and the rest of it',
+      accessType: 'public',
+      UserId: 2,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     }], {});
   },
   down: (queryInterface) => {
