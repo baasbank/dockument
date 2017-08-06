@@ -45,6 +45,8 @@
     "pg": "^6.4.0",
     "pg-hstore": "^2.3.2",
     "sequelize": "^4.2.1",
+    "swagger": "^0.7.5",
+    "swagger-jsdoc": "^1.9.4",
     "winston": "^2.3.1"
   },
   "devDependencies": {
