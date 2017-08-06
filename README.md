@@ -1,5 +1,5 @@
 # dockument
-[![Build Status](https://travis-ci.org/baasbank/dockument.svg?branch=staging](https://travis-ci.org/baasbank/dockument)[![Code Climate](https://codeclimate.com/github/codeclimate/codeclimate/badges/gpa.svg)](https://codeclimate.com/github/codeclimate/codeclimate)
+[![Build Status](https://travis-ci.org/baasbank/dockument.svg?branch=staging](https://travis-ci.org/baasbank/dockument)[![Code Climate](https://codeclimate.com/github/codeclimate/codeclimate/badges/gpa.svg)](https://codeclimate.com/github/codeclimate/codeclimate)[![Coverage Status](https://coveralls.io/repos/github/baasbank/dockument/badge.svg?branch=staging)](https://coveralls.io/github/baasbank/dockument?branch=staging)
 
 ## Introduction
 
