@@ -1,5 +1,4 @@
 const RolesController = require('../controllers/rolesController');
-// import UsersAuthentication from '../middlewares/UsersAuthentication';
 
 /**
  * Define roles routes

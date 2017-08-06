@@ -3,4 +3,6 @@ DS_Store
 .vscode
 .env
 npm-debug.log
+coverage
+.nyc_output
 

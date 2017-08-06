@@ -100,7 +100,7 @@ class usersController {
                   expiresIn: '48h'
                 });
                 res.status(201).json({
-                  userData,
+                  message: 'login successful',
                   token
                 });
               } else {
