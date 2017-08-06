@@ -2,7 +2,7 @@
   "development": {
     "username": "postgres",
     "password": null,
-    "database": "documents",
+    "database": "DMS",
     "host": "127.0.0.1",
     "port": "5432",
     "dialect": "postgres"
@@ -10,10 +10,10 @@
   "test": {
     "username": "baasbank",
     "password": null,
-    "database": "documents",
+    "database": "test",
     "host": "127.0.0.1",
     "port": "5432",
-    "dialect": "mysql"
+    "dialect": "postgres"
   },
   "production": {
     "username": "root",

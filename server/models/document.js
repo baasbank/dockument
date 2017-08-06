@@ -42,4 +42,3 @@ module.exports = (sequelize, DataTypes) => {
   });
   return Document;
 };
-
