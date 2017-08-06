@@ -8,6 +8,6 @@ before_script:
   - npm install -g nyc
   - npm install -g sequelize-cli
 script:
-  - gulp test
+  - node node_modules/.bin/gulp test"
 
 after_success: ./node_modules/.bin/coveralls --verbose < coverage/lcov.info
