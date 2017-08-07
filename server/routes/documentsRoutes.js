@@ -1,4 +1,4 @@
-const DocumentsController = require('../controllers/documentsController');
+const DocumentsController = require('../controllers/DocumentsController');
 const authenticate = require('../middleware/authenticate');
 
 /** 
@@ -53,7 +53,7 @@ const authenticate = require('../middleware/authenticate');
  * @param {function} router
  * @returns {void}
  */
-const documentsRoute = (router) => {
+const DocumentsRoute = (router) => {
   // Create a new user, and get all users
   router.route('/documents/')
 /**
@@ -264,4 +264,4 @@ const documentsRoute = (router) => {
     .get(authenticate.verifyToken, DocumentsController.searchDocuments);
 };
 
-module.exports = documentsRoute;
+module.exports = DocumentsRoute;

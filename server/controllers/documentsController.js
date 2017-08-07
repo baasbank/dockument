@@ -1,20 +1,20 @@
 const db = require('../models');
-const Helper = require('../helper/Helper');
+const helper = require('../helper/helper');
 
 const Document = db.Document;
 
 /**
  * class to create and manage documents
- * @class documentsController
+ * @class DocumentsController
  */
-class documentsController {
+class DocumentsController {
   /**
    * create a new document
    * @static
    * @param {Object} req - Request object
    * @param {Object} res - Response object
    * @returns {object} json - payload
-   * @memberOf documentsController
+   * @memberOf DocumentsController
    */
   static createDocument(req, res) {
     if (req.body.title &&
@@ -54,7 +54,7 @@ class documentsController {
    * @param {Object} req - Request object
    * @param {Object} res - Response object
    *@returns {object} json - payload
-   * @memberOf documentsController
+   * @memberOf DocumentsController
    */
   static getAllDocuments(req, res) {
     if ((!req.query.limit) && (!req.query.offset)) {
@@ -85,7 +85,7 @@ class documentsController {
       Document
         .findAndCountAll(query)
         .then((documents) => {
-          const pagination = Helper.pagination(
+          const pagination = helper.pagination(
             query.limit, query.offset, documents.count
           );
           res.status(200).send({
@@ -102,7 +102,7 @@ class documentsController {
    * @param {Object} req - Request object
    * @param {Object} res - Response object
    *@returns {object} json - payload
-   * @memberOf documentsController
+   * @memberOf DocumentsController
    */
   static findADocument(req, res) {
     return Document
@@ -143,7 +143,7 @@ class documentsController {
    * @param {Object} req - Request object
    * @param {Object} res - Response object
    * @returns {object} json - payload
-   * @memberOf documentsController
+   * @memberOf DocumentsController
    */
   static updateDocument(req, res) {
     Document
@@ -199,7 +199,7 @@ class documentsController {
     * @param {Object} req request object
     * @param {Object} res response object
     * @returns {object} json - payload
-    * @memberOf documentsController
+    * @memberOf DocumentsController
     */
   static deleteADocument(req, res) {
     Document
@@ -234,7 +234,7 @@ class documentsController {
    * @param {Object} res - Response object
    * @returns {object} json - payload
    *
-   * @memberOf documentsController
+   * @memberOf DocumentsController
    */
   static searchDocuments(req, res) {
     const searchTerm = req.query.search.trim();
@@ -254,7 +254,7 @@ class documentsController {
     Document
       .findAndCountAll(query)
       .then((documents) => {
-        const pagination = Helper.pagination(
+        const pagination = helper.pagination(
           query.limit, query.offset, documents.count
         );
         if (!documents.rows.length) {
@@ -269,4 +269,4 @@ class documentsController {
   }
 }
 
-module.exports = documentsController;
+module.exports = DocumentsController;

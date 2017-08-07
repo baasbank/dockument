@@ -82,7 +82,7 @@ const authenticate = require('../middleware/authenticate');
  * @param {function} router
  * @returns {void}
  */
-const usersRoute = (router) => {
+const UsersRoute = (router) => {
   // Create a new user, and get all users
   router.route('/users/')
 /**
@@ -388,4 +388,4 @@ const usersRoute = (router) => {
     .get(authenticate.verifyToken, UsersController.getUserDocuments);
 };
 
-module.exports = usersRoute;
+module.exports = UsersRoute;

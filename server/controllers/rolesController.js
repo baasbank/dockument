@@ -6,7 +6,7 @@ const Role = db.Role;
  * class to create and manage roles
  * @class rolesController
  */
-class rolesController {
+class RolesController {
   /**
    * Create a new role
    *
@@ -14,7 +14,7 @@ class rolesController {
    * @param {Object} req - Request object
    * @param {Object} res - Response object
    * @returns {object} json - payload
-   * @memberOf rolesController
+   * @memberOf RolesController
    */
   static createRole(req, res) {
     Role.findOne({ where: { roleType: req.body.roleType } })
@@ -40,5 +40,5 @@ class rolesController {
   }
 }
 
-module.exports = rolesController;
+module.exports = RolesController;
 

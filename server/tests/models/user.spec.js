@@ -1,6 +1,6 @@
 import chai from 'chai';
 import models from '../../models/';
-import data from '../mockData';
+import data from '../MockData';
 
 const expect = chai.expect;
 const { fakeAudax } = data;

@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 const db = require('../models');
-const Helper = require('../helper/Helper');
+const helper = require('../helper/helper');
 
 const secret = process.env.SECRET;
 const Role = db.Role;
@@ -14,11 +14,11 @@ const Document = db.Document;
 
 
 /**
- * usersController class to create and manage users
+ * UsersController class to create and manage users
  *
- * @class usersController
+ * @class UsersController
  */
-class usersController {
+class UsersController {
 /**
    * Create a user
    *
@@ -26,7 +26,7 @@ class usersController {
    * @param {Object} req - Request object
    * @param {Object} res - Response object
    * @returns {void}
-   * @memberOf usersController
+   * @memberOf UsersController
    */
   static createUser(req, res) {
     if (req.body.name &&
@@ -86,7 +86,7 @@ class usersController {
    * @param {Object} req - Request object
    * @param {Object} res - Response object
    * @returns {void}
-   * @memberOf usersController
+   * @memberOf UsersController
    */
   static login(req, res) {
     if (!(req.body.password) || !(req.body.email)) {
@@ -124,7 +124,7 @@ class usersController {
    * @param {Object} req - Request object
    * @param {Object} res - Response object
    *@returns {void}
-   * @memberOf usersController
+   * @memberOf UsersController
    */
   static getAllUsers(req, res) {
     if ((!req.query.limit) && (!req.query.offset)) {
@@ -152,7 +152,7 @@ class usersController {
       User
         .findAndCountAll(query)
         .then((users) => {
-          const pagination = Helper.pagination(
+          const pagination = helper.pagination(
             query.limit, query.offset, users.count
           );
           res.status(200).send({
@@ -196,7 +196,7 @@ class usersController {
    * @param {Object} req - Request object
    * @param {Object} res - Response object
    * @returns {object} json - payload
-   * @memberOf usersController
+   * @memberOf UsersController
    */
   static updateUser(req, res) {
     Role.findOne({ where: { roleType: req.decoded.roleType } })
@@ -253,6 +253,7 @@ class usersController {
     * @param {Object} req request object
     * @param {Object} res response object
     * @returns {object} json - payload
+    * @memberOf UsersController
     */
   static deleteAUser(req, res) {
     User
@@ -281,7 +282,6 @@ class usersController {
    * @param {Object} req - Request object
    * @param {Object} res - Response object
    * @returns {object} json- payload
-   *
    * @memberOf usersController
    */
   static searchUsers(req, res) {
@@ -306,7 +306,7 @@ class usersController {
     User
       .findAndCountAll(query)
       .then((users) => {
-        const pagination = Helper.pagination(
+        const pagination = helper.pagination(
           query.limit, query.offset, users.count
         );
         if (!users.rows.length) {
@@ -327,7 +327,7 @@ class usersController {
    * @param {Object} req - Request object
    * @param {Object} res - Response object
    * @returns {object} json - payload
-   * @memberOf usersController
+   * @memberOf UsersController
    */
   static getUserDocuments(req, res) {
     const query = {
@@ -351,7 +351,7 @@ class usersController {
             updatedAt: document.updatedAt,
           }));
 
-        const pagination = Helper.pagination(
+        const pagination = helper.pagination(
           query.limit, query.offset, documents.count
         );
         if (!documents.rows.length) {
@@ -369,4 +369,4 @@ class usersController {
   }
 }
 
-module.exports = usersController;
+module.exports = UsersController;

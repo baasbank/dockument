@@ -1,6 +1,5 @@
 import faker from 'faker';
 import dotenv from 'dotenv';
-import bcrypt from 'bcrypt';
 
 dotenv.config();
 
