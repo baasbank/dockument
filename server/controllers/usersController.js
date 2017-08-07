@@ -18,11 +18,10 @@ const Document = db.Document;
 class UsersController {
 /**
    * Create a user
-   *
    * @static
    * @param {Object} req - Request object
    * @param {Object} res - Response object
-   * @returns {void}
+   * @returns {object} json - payload
    * @memberOf UsersController
    */
   static createUser(req, res) {
@@ -82,7 +81,7 @@ class UsersController {
    * @static
    * @param {Object} req - Request object
    * @param {Object} res - Response object
-   * @returns {void}
+   * @returns {object} json - payload 
    * @memberOf UsersController
    */
   static login(req, res) {
@@ -115,12 +114,12 @@ class UsersController {
     }
   }
   /**
-   * List all users
+   * Get all users
    *
    * @static
    * @param {Object} req - Request object
    * @param {Object} res - Response object
-   *@returns {void}
+   *@returns {object} json - payload
    * @memberOf UsersController
    */
   static getAllUsers(req, res) {
@@ -164,7 +163,7 @@ class UsersController {
    * @static
    * @param {Object} req - Request object
    * @param {Object} res - Response object
-   *@returns {void}
+   *@returns {object} user - the user's details
    * @memberOf UsersController
    */
   static findAUser(req, res) {
@@ -249,7 +248,7 @@ class UsersController {
     * Delete a user by id
     * @param {Object} req request object
     * @param {Object} res response object
-    * @returns {object} json - payload
+    * @returns {object} message - delete message
     * @memberOf UsersController
     */
   static deleteAUser(req, res) {

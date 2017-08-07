@@ -3,13 +3,12 @@ import db from '../models';
 const Role = db.Role;
 
 /**
- * class to create and manage roles
- * @class rolesController
+ * class to create roles
+ * @class RolesController
  */
 class RolesController {
   /**
    * Create a new role
-   *
    * @static
    * @param {Object} req - Request object
    * @param {Object} res - Response object

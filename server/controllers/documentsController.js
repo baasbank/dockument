@@ -48,7 +48,7 @@ class DocumentsController {
   }
 
   /**
-   * get all users
+   * get all documents
    *
    * @static
    * @param {Object} req - Request object
@@ -97,7 +97,6 @@ class DocumentsController {
 
   /**
    * Find a document by ID
-   *
    * @static
    * @param {Object} req - Request object
    * @param {Object} res - Response object
@@ -137,8 +136,7 @@ class DocumentsController {
   }
 
   /**
-   * update a document
-   *
+   * update a document by id
    * @static
    * @param {Object} req - Request object
    * @param {Object} res - Response object
@@ -228,12 +226,11 @@ class DocumentsController {
   }
 
   /**
-   * get all documents
+   * search documents
    * @static
    * @param {Object} req - Request object
    * @param {Object} res - Response object
    * @returns {object} json - payload
-   *
    * @memberOf DocumentsController
    */
   static searchDocuments(req, res) {
