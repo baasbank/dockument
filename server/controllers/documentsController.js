@@ -1,5 +1,5 @@
-const db = require('../models');
-const helper = require('../helper/helper');
+import db from '../models';
+import helper from '../helper/helper';
 
 const Document = db.Document;
 
@@ -269,4 +269,4 @@ class DocumentsController {
   }
 }
 
-module.exports = DocumentsController;
+export default DocumentsController;

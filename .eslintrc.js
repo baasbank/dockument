@@ -14,7 +14,6 @@ module.exports = {
     "rules": {
         "one-var": 0,
         "jsx-a11y/href-no-hash": "off",
-        //"jsx-a11y/anchor-is-valid": ["warn", { "aspects": ["invalidHref"] }],
         "one-var-declaration-per-line": 0,
         "new-cap": 0,
         "consistent-return": 0,

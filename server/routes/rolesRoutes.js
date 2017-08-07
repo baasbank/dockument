@@ -73,4 +73,4 @@ const RolesRoute = (router) => {
     .post(authenticate.verifyToken, authenticate.hasAdminAccess, RolesController.createRole);
 };
 
-module.exports = RolesRoute;
+export default RolesRoute;

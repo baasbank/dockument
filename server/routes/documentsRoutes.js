@@ -1,5 +1,5 @@
-const DocumentsController = require('../controllers/DocumentsController');
-const authenticate = require('../middleware/authenticate');
+import DocumentsController from '../controllers/DocumentsController';
+import authenticate from '../middleware/authenticate';
 
 /** 
  * @swagger
@@ -264,4 +264,4 @@ const DocumentsRoute = (router) => {
     .get(authenticate.verifyToken, DocumentsController.searchDocuments);
 };
 
-module.exports = DocumentsRoute;
+export default DocumentsRoute;

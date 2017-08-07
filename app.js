@@ -1,14 +1,11 @@
 import swaggerJSDoc from 'swagger-jsdoc';
 import path from 'path';
-
-const winston = require('winston');
-
-const routes = require('./server/routes/');
-
-const express = require('express');
-const logger = require('morgan');
-const bodyParser = require('body-parser');
-const http = require('http');
+import winston from 'winston';
+import express from 'express';
+import logger from 'morgan';
+import bodyParser from 'body-parser';
+import http from 'http';
+import routes from './server/routes/';
 
 // Set up the express app
 const app = express();
@@ -76,5 +73,4 @@ server.listen(port, () => {
   winston.info(`The server is running on localhost:${port}`);
 });
 
-
-module.exports = app;
+export default app;

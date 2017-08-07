@@ -34,4 +34,4 @@ class helper {
   }
 }
 
-module.exports = helper;
+export default helper;

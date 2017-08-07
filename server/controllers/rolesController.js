@@ -1,4 +1,4 @@
-const db = require('../models');
+import db from '../models';
 
 const Role = db.Role;
 
@@ -40,5 +40,5 @@ class RolesController {
   }
 }
 
-module.exports = RolesController;
+export default RolesController;
 

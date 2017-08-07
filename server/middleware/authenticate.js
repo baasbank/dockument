@@ -12,7 +12,7 @@ const secret = process.env.SECRET;
    * @returns {object} json - payload
    */
 
-function verifyToken(req, res, next) {
+const verifyToken = (req, res, next) => {
   const token = req.headers.authorization || req.headers['x-access-token'];
   if (token) {
     jwt.verify(token, secret, (err, decoded) => {
@@ -29,7 +29,7 @@ function verifyToken(req, res, next) {
       message: 'No token provided.'
     });
   }
-}
+};
 
 /**
    * Check for admin
@@ -40,7 +40,7 @@ function verifyToken(req, res, next) {
    * @returns {object} json - payload
    */
 
-function hasAdminAccess(req, res, next) {
+const hasAdminAccess = (req, res, next) => {
   if (req.decoded.roleType === 'admin') {
     next();
   } else {
@@ -48,9 +48,9 @@ function hasAdminAccess(req, res, next) {
       message: 'No authorization',
     });
   }
-}
+};
 
-module.exports = {
+export default {
   verifyToken,
   hasAdminAccess
 };

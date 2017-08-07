@@ -1,5 +1,5 @@
-const UsersController = require('../controllers/usersController');
-const authenticate = require('../middleware/authenticate');
+import UsersController from '../controllers/UsersController';
+import authenticate from '../middleware/authenticate';
 
 /**
  * @swagger
@@ -388,4 +388,4 @@ const UsersRoute = (router) => {
     .get(authenticate.verifyToken, UsersController.getUserDocuments);
 };
 
-module.exports = UsersRoute;
+export default UsersRoute;

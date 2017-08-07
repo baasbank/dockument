@@ -1,17 +1,14 @@
 import bcrypt from 'bcrypt';
-
-const jwt = require('jsonwebtoken');
+import jwt from 'jsonwebtoken';
+import db from '../models';
+import helper from '../helper/helper';
 
 require('dotenv').config();
-
-const db = require('../models');
-const helper = require('../helper/helper');
 
 const secret = process.env.SECRET;
 const Role = db.Role;
 const User = db.User;
 const Document = db.Document;
-
 
 /**
  * UsersController class to create and manage users
@@ -369,4 +366,4 @@ class UsersController {
   }
 }
 
-module.exports = UsersController;
+export default UsersController;
