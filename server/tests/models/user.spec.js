@@ -7,7 +7,7 @@ const { fakeAudax } = data;
 let dummyId;
 
 describe('User Model', () => {
-  describe('Create a new User', () => {
+  describe('models.User.create()', () => {
     it('should create a user', (done) => {
       models.User.create(fakeAudax)
         .then((user) => {
@@ -26,7 +26,7 @@ describe('User Model', () => {
         });
     });
   });
-  describe('Update User', () => {
+  describe('models.User.update', () => {
     it('should update a user', (done) => {
       models.User.findById(dummyId)
         .then((user) => {
