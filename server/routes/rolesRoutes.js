@@ -1,4 +1,4 @@
-import RolesController from '../controllers/RolesController';
+import rolesController from '../controllers/rolesController';
 import authenticate from '../middleware/authenticate';
 
 /**
@@ -40,7 +40,7 @@ import authenticate from '../middleware/authenticate';
  * @param {function} router
  * @returns {void}
  */
-const RolesRoute = (router) => {
+const rolesRoute = (router) => {
   // Create a new role
   router.route('/roles')
 /** 
@@ -70,7 +70,7 @@ const RolesRoute = (router) => {
  *        security:
  *        - Authorization: []
  */
-    .post(authenticate.verifyToken, authenticate.hasAdminAccess, RolesController.createRole);
+    .post(authenticate.verifyToken, authenticate.hasAdminAccess, rolesController.createRole);
 };
 
-export default RolesRoute;
+export default rolesRoute;

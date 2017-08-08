@@ -1,4 +1,4 @@
-module.exports = {
+{
     "extends": "airbnb",
     "plugins": [
         "react",
@@ -9,7 +9,7 @@ module.exports = {
         "node": true,
         "es6": true,
         "browser": true,
-        "mocha": true,
+        "mocha": true
     },
     "rules": {
         "one-var": 0,
@@ -34,7 +34,7 @@ module.exports = {
                 "MethodDefinition": true,
                 "ClassDeclaration": true,
                 "ArrowFunctionExpression": true
-            },
-        }],
+            }
+        }]
     }
 }

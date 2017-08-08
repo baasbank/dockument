@@ -247,16 +247,6 @@ describe('Users', () => {
           done();
         });
     });
-    it('should return a message for invalid user id', (done) => {
-      chai.request(app)
-        .get('/api/v1/users/jkfjdkjfld/documents')
-        .set({ 'Authorization': adminToken })
-        .end((err, res) => {
-          expect(res.status).to.equal(400);
-          expect(err.response.text).to.eql('Error. Please check the id and try again');
-          done();
-        });
-    });
     it('should return a message for user id not in the database', (done) => {
       chai.request(app)
         .get('/api/v1/users/5/documents')

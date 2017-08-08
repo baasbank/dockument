@@ -5,16 +5,16 @@ const Document = db.Document;
 
 /**
  * class to create and manage documents
- * @class DocumentsController
+ * @class documentsController
  */
-class DocumentsController {
+class documentsController {
   /**
    * create a new document
    * @static
    * @param {Object} req - Request object
    * @param {Object} res - Response object
    * @returns {object} json - payload
-   * @memberOf DocumentsController
+   * @memberOf documentsController
    */
   static createDocument(req, res) {
     if (req.body.title &&
@@ -54,7 +54,7 @@ class DocumentsController {
    * @param {Object} req - Request object
    * @param {Object} res - Response object
    *@returns {object} json - payload
-   * @memberOf DocumentsController
+   * @memberOf documentsController
    */
   static getAllDocuments(req, res) {
     if ((!req.query.limit) && (!req.query.offset)) {
@@ -101,7 +101,7 @@ class DocumentsController {
    * @param {Object} req - Request object
    * @param {Object} res - Response object
    *@returns {object} json - payload
-   * @memberOf DocumentsController
+   * @memberOf documentsController
    */
   static findADocument(req, res) {
     return Document
@@ -141,7 +141,7 @@ class DocumentsController {
    * @param {Object} req - Request object
    * @param {Object} res - Response object
    * @returns {object} json - payload
-   * @memberOf DocumentsController
+   * @memberOf documentsController
    */
   static updateDocument(req, res) {
     Document
@@ -197,7 +197,7 @@ class DocumentsController {
     * @param {Object} req request object
     * @param {Object} res response object
     * @returns {object} json - payload
-    * @memberOf DocumentsController
+    * @memberOf documentsController
     */
   static deleteADocument(req, res) {
     Document
@@ -231,7 +231,7 @@ class DocumentsController {
    * @param {Object} req - Request object
    * @param {Object} res - Response object
    * @returns {object} json - payload
-   * @memberOf DocumentsController
+   * @memberOf documentsController
    */
   static searchDocuments(req, res) {
     const searchTerm = req.query.search.trim();
@@ -266,4 +266,4 @@ class DocumentsController {
   }
 }
 
-export default DocumentsController;
+export default documentsController;
