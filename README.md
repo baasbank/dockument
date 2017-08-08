@@ -1,5 +1,7 @@
 # dockument
-[![Build Status](https://travis-ci.org/baasbank/dockument.svg?branch=staging](https://travis-ci.org/baasbank/dockument)[![Code Climate](https://codeclimate.com/github/codeclimate/codeclimate/badges/gpa.svg)](https://codeclimate.com/github/codeclimate/codeclimate)[![Coverage Status](https://coveralls.io/repos/github/baasbank/dockument/badge.svg?branch=staging)](https://coveralls.io/github/baasbank/dockument?branch=staging)
+[![Build Status](https://travis-ci.org/baasbank/dockument.svg?branch=staging)](https://travis-ci.org/baasbank/dockument) 
+[![Code Climate](https://codeclimate.com/github/codeclimate/codeclimate/badges/gpa.svg)](https://codeclimate.com/github/codeclimate/codeclimate)
+[![Coverage Status](https://coveralls.io/repos/github/baasbank/dockument/badge.svg?branch=staging)](https://coveralls.io/github/baasbank/dockument?branch=staging)
 
 ## Introduction
 
@@ -26,8 +28,8 @@ This API has the following features.
 #### Roles
 
 * Every user must have a role defined for him/her (the default role is regular user).
-* The admin can create, get all, update and delete roles.
-* Restricts a non-admin from tampering with roles.
+* The admin can create new roles.
+* It restricts a non-admin from tampering with roles.
 
 #### Documents
 
@@ -43,7 +45,7 @@ This API has the following features.
 * An admin can search for and retrieve any user's information.
 
 ## Usage
-Click [here](https://dockument.herokuapp.com) to access the application.
+Click [here](https://dockument.herokuapp.com) to access the application online.
 Or download or clone this repository and run it on your machine.
 
 ## For local installation & testing:
@@ -75,10 +77,10 @@ Or download or clone this repository and run it on your machine.
 
 ## Resources
 
-* [JSON Web Token (JWT):](https://jwt.io/introduction/) JWT is an open standard that defines a compact and self-contained way for securely transmitting information between parties as a JSON object. 
+* [JSON Web Token (JWT):](https://jwt.io/introduction/) JWT is an open standard that defines a compact and self-contained way for securely transmitting information between parties as a JSON object. JWT is used for secure login.
 
 ## Contributing
-* Please read [here](https://github.com/baasbank/dockument/wiki/Contributing) for details on code of conduct, and the process for submitting pull requests to me.
+##### Please read [this](https://github.com/baasbank/dockument/wiki/) for details on code of conduct, and the process for submitting pull requests to me.
 
 * Fork this repository by clicking the `Fork` menu item in the top right corner of this repository.
 * Go to your github account, and under your repository list, you should find this project listed.
