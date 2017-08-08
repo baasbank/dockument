@@ -1,5 +1,5 @@
-import RolesController from '../controllers/rolesController';
-import Authenticate from '../middleware/authenticate';
+import rolesController from '../controllers/rolesController';
+import authenticate from '../middleware/authenticate';
 
 /**
  * @swagger
@@ -70,7 +70,7 @@ const rolesRoute = (router) => {
  *        security:
  *        - Authorization: []
  */
-    .post(Authenticate.verifyToken, Authenticate.hasAdminAccess, RolesController.createRole);
+    .post(authenticate.verifyToken, authenticate.hasAdminAccess, rolesController.createRole);
 };
 
-module.exports = rolesRoute;
+export default rolesRoute;

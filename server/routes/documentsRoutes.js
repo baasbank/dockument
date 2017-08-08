@@ -1,5 +1,5 @@
-const DocumentsController = require('../controllers/documentsController');
-const authenticate = require('../middleware/authenticate');
+import documentsController from '../controllers/documentsController';
+import authenticate from '../middleware/authenticate';
 
 /** 
  * @swagger
@@ -129,9 +129,9 @@ const documentsRoute = (router) => {
  *       security:
  *       - Authorization: []
  */ 
-    .post(authenticate.verifyToken, DocumentsController.createDocument)
+    .post(authenticate.verifyToken, documentsController.createDocument)
     .get(authenticate.verifyToken,
-      DocumentsController.getAllDocuments);
+      documentsController.getAllDocuments);
 
   // get, update, and delete a document by its ID
   router.route('/documents/:id')
@@ -227,9 +227,9 @@ const documentsRoute = (router) => {
  *       security:
  *       - Authorization: []
  */ 
-    .get(authenticate.verifyToken, DocumentsController.findADocument)
-    .put(authenticate.verifyToken, DocumentsController.updateDocument)
-    .delete(authenticate.verifyToken, DocumentsController.deleteADocument);
+    .get(authenticate.verifyToken, documentsController.findADocument)
+    .put(authenticate.verifyToken, documentsController.updateDocument)
+    .delete(authenticate.verifyToken, documentsController.deleteADocument);
 
   // search for documents
   router.route('/search/documents')
@@ -261,7 +261,7 @@ const documentsRoute = (router) => {
  *        security:
  *        - Authorization: []
  */           
-    .get(authenticate.verifyToken, DocumentsController.searchDocuments);
+    .get(authenticate.verifyToken, documentsController.searchDocuments);
 };
 
-module.exports = documentsRoute;
+export default documentsRoute;

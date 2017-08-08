@@ -1,6 +1,5 @@
 import faker from 'faker';
 import dotenv from 'dotenv';
-import bcrypt from 'bcrypt';
 
 dotenv.config();
 
@@ -30,7 +29,7 @@ export default {
     email: 'baasbank@test.com'
   },
   fakeEsther: {
-    name: faker.name.findName(),
+    fullName: faker.name.findName(),
     email: faker.internet.email(),
     password: 'esther',
   },

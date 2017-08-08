@@ -27,8 +27,8 @@ describe('Roles', () => {
     done();
   });
 
-  describe('create roles endpoint', () => {
-    it('should create a new user', (done) => {
+  describe('POST: /roles/', () => {
+    it('should create a new role', (done) => {
       chai.request(app)
         .post('/api/v1/roles/')
         .send({ roleType: 'super admin'})

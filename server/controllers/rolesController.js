@@ -1,15 +1,14 @@
-const db = require('../models');
+import db from '../models';
 
 const Role = db.Role;
 
 /**
- * class to create and manage roles
+ * class to create roles
  * @class rolesController
  */
 class rolesController {
   /**
    * Create a new role
-   *
    * @static
    * @param {Object} req - Request object
    * @param {Object} res - Response object
@@ -40,5 +39,5 @@ class rolesController {
   }
 }
 
-module.exports = rolesController;
+export default rolesController;
 

@@ -1,4 +1,4 @@
-const jwt = require('jsonwebtoken');
+import jwt from 'jsonwebtoken';
 
 const secret = process.env.SECRET;
 
@@ -9,10 +9,10 @@ const secret = process.env.SECRET;
    * @param {Object} req - Request object
    * @param {Object} res - Response object
    * @param {object} next - next function to call
-   * @returns {object} json - payload
+   * @returns {object} message - verification status
    */
 
-function verifyToken(req, res, next) {
+const verifyToken = (req, res, next) => {
   const token = req.headers.authorization || req.headers['x-access-token'];
   if (token) {
     jwt.verify(token, secret, (err, decoded) => {
@@ -29,7 +29,7 @@ function verifyToken(req, res, next) {
       message: 'No token provided.'
     });
   }
-}
+};
 
 /**
    * Check for admin
@@ -37,10 +37,10 @@ function verifyToken(req, res, next) {
    * @param {Object} req - Request object
    * @param {Object} res - Response object
    * @param {object} next - next function to call
-   * @returns {object} json - payload
+   * @returns {object} message - authorization status
    */
 
-function hasAdminAccess(req, res, next) {
+const hasAdminAccess = (req, res, next) => {
   if (req.decoded.roleType === 'admin') {
     next();
   } else {
@@ -48,9 +48,9 @@ function hasAdminAccess(req, res, next) {
       message: 'No authorization',
     });
   }
-}
+};
 
-module.exports = {
+export default {
   verifyToken,
   hasAdminAccess
 };

@@ -1,16 +1,16 @@
 /**
- * Controllers helper class
+ * helper class for controllers
  *
- * @class Helper
+ * @class helper
  */
-class Helper {
+class helper {
   /**
    * @static
-   * @param {integer} limit
-   * @param {integer} offset
-   * @param {integer} count
-   * @returns {Object} - Returns Pagination Result
-   * @memberOf ControllerHelper
+   * @param {integer} limit - max no. per page
+   * @param {integer} offset - no. to offset by
+   * @param {integer} count - total no. of records
+   * @returns {Object} - returns pagination result
+   * @memberOf helper
    */
   static pagination(limit, offset, count) {
     /** totalCount : total number of records based on query
@@ -34,4 +34,4 @@ class Helper {
   }
 }
 
-module.exports = Helper;
+export default helper;

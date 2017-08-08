@@ -31,7 +31,7 @@ describe('Documents', () => {
       });
   });
 
-  describe('Creating a new document ', () => {
+  describe('POST: /documents/', () => {
     it('should create a new document', (done) => {
       chai.request(app)
         .post('/api/v1/documents')
@@ -57,8 +57,8 @@ describe('Documents', () => {
         });
     });
   });
-  describe(' get all documents', () => {
-    it('should display all documents to an admin', (done) => {
+  describe('GET: /documents/', () => {
+    it('should display all documents', (done) => {
       chai.request(app)
         .get('/api/v1/documents')
         .set({ 'Authorization': superUserToken })
@@ -82,8 +82,8 @@ describe('Documents', () => {
         });
     });
   });
-  describe('fetch a document by id', () => {
-    it('should fetch a document given an id', (done) => {
+  describe('GET: /documents/:id', () => {
+    it('should fetch a document given its id', (done) => {
       chai.request(app)
         .get('/api/v1/documents/1')
         .set({ 'Authorization': superUserToken })
@@ -98,6 +98,8 @@ describe('Documents', () => {
           done();
         });
     });
+  });
+  describe('PUT: /documents/:id', () => {
     it('should allow a user update her document by id', (done) => {
       chai.request(app)
         .put('/api/v1/documents/4')
@@ -151,7 +153,7 @@ describe('Documents', () => {
         });
     });
   });
-  describe('delete a document by id', () => {
+  describe('DELETE: /documents/:id', () => {
     it('should allow the owner of a document delete it', (done) => {
       chai.request(app)
         .delete('/api/v1/documents/2')
@@ -175,7 +177,7 @@ describe('Documents', () => {
         });
     });
   });
-  describe('search for a document by title', () => {
+  describe('GET: /search/documents/?q={doctitle}', () => {
     it('should allow a user search for documents by title', (done) => {
       chai.request(app)
         .get('/api/v1/search/documents?search=first')
@@ -187,7 +189,7 @@ describe('Documents', () => {
           done();
         });
     });
-    it('should return a message when search is not fruitful', (done) => {
+    it('should return a message when document is not found', (done) => {
       chai.request(app)
         .get('/api/v1/search/documents?search=firsthead')
         .set({ 'Authorization': superUserToken })

@@ -1,5 +1,5 @@
-const db = require('../models');
-const Helper = require('../helper/Helper');
+import db from '../models';
+import helper from '../helper/Helper';
 
 const Document = db.Document;
 
@@ -37,7 +37,7 @@ class documentsController {
             ownerId: document.UserId
           }
         }))
-        .catch(() => res.status(400).send({
+        .catch(() => res.status(500).send({
           message: 'Error. Please try again.',
         }));
     } else {
@@ -48,7 +48,7 @@ class documentsController {
   }
 
   /**
-   * get all users
+   * get all documents
    *
    * @static
    * @param {Object} req - Request object
@@ -75,7 +75,7 @@ class documentsController {
               })
             });
         })
-        .catch(() => res.status(400).send({
+        .catch(() => res.status(500).send({
           message: 'An error occured.',
         }));
     } else {
@@ -85,7 +85,7 @@ class documentsController {
       Document
         .findAndCountAll(query)
         .then((documents) => {
-          const pagination = Helper.pagination(
+          const pagination = helper.pagination(
             query.limit, query.offset, documents.count
           );
           res.status(200).send({
@@ -97,7 +97,6 @@ class documentsController {
 
   /**
    * Find a document by ID
-   *
    * @static
    * @param {Object} req - Request object
    * @param {Object} res - Response object
@@ -137,8 +136,7 @@ class documentsController {
   }
 
   /**
-   * update a document
-   *
+   * update a document by id
    * @static
    * @param {Object} req - Request object
    * @param {Object} res - Response object
@@ -184,11 +182,11 @@ class documentsController {
             message: 'Update Successful!',
             document,
           }))
-          .catch(() => res.status(400).send({
+          .catch(() => res.status(500).send({
             message: 'Error. Please try again.',
           }));
       })
-      .catch(() => res.status(400).send({
+      .catch(() => res.status(500).send({
         message: 'Error. Please try again.',
       }));
   }
@@ -222,18 +220,17 @@ class documentsController {
             message: 'Document deleted successfully.',
           }));
       })
-      .catch(() => res.status(400).send({
+      .catch(() => res.status(500).send({
         message: 'Error. Please try again.',
       }));
   }
 
   /**
-   * get all documents
+   * search documents
    * @static
    * @param {Object} req - Request object
    * @param {Object} res - Response object
    * @returns {object} json - payload
-   *
    * @memberOf documentsController
    */
   static searchDocuments(req, res) {
@@ -254,7 +251,7 @@ class documentsController {
     Document
       .findAndCountAll(query)
       .then((documents) => {
-        const pagination = Helper.pagination(
+        const pagination = helper.pagination(
           query.limit, query.offset, documents.count
         );
         if (!documents.rows.length) {
@@ -269,4 +266,4 @@ class documentsController {
   }
 }
 
-module.exports = documentsController;
+export default documentsController;

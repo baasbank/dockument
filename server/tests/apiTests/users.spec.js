@@ -35,7 +35,7 @@ describe('Users', () => {
     models.User.destroy({ where: { id: { $notIn: [1, 2, 3, 4, 5] } } });
     done();
   });
-  describe('user login endpoint', () => {
+  describe('POST: /users/login', () => {
     it('should log in a user and return a token', (done) => {
       chai.request(app)
         .post('/api/v1/users/login').send(admin).end((err, res) => {
@@ -64,7 +64,7 @@ describe('Users', () => {
         });
     });
   });
-  describe('user sign up endpoint', () => {
+  describe('POST: /users/', () => {
     it('should return a message for incomplete user details', (done) => {
       chai.request(app)
         .post('/api/v1/users/').send(fakeUserDetails).end((err, res) => {
@@ -78,13 +78,13 @@ describe('Users', () => {
       chai.request(app)
         .post('/api/v1/users/').send(fakeEsther).end((err, res) => {
           expect(res.status).to.equal(201);
-          expect(res.body).to.have.keys(['message', 'user', 'token']);
+          expect(res.body).to.have.keys(['message', 'user']);
           expect(res.body.message).to.eql('signup successful');
           done();
         });
     });
   });
-  describe('get users', () => {
+  describe('GET: /users/', () => {
     it('should return all users if user is admin', (done) => {
       chai.request(app)
         .get('/api/v1/users')
@@ -107,7 +107,7 @@ describe('Users', () => {
           done();
         });
     });
-    it('should return all users if user is admin and limit and query is supplied', (done) => {
+    it('should paginate users if user is admin and limit and query is supplied', (done) => {
       chai.request(app)
         .get('/api/v1/users?limit=2&offset=0')
         .set({ 'Authorization': adminToken })
@@ -120,8 +120,8 @@ describe('Users', () => {
         });
     });
   });
-  describe('find a user by id', () => {
-    it('should return a user given an id', (done) => {
+  describe('GET: /users/:id', () => {
+    it('should return a user given the user Id', (done) => {
       chai.request(app)
         .get('/api/v1/users/1')
         .set({ Authorization: regularUserToken })
@@ -145,14 +145,14 @@ describe('Users', () => {
         });
     });
   });
-  describe('update a user by id', () => {
+  describe('PUT: /users/:id', () => {
     it('should allow a user update her profile', (done) => {
       chai.request(app)
         .put('/api/v1/users/1')
         .send(updateUser)
         .set({ 'Authorization': adminToken })
         .end((err, res) => {
-          expect(res.status).to.equal(205);
+          expect(res.status).to.equal(200);
           expect(res.body).to.have.keys(['message', 'user']);
           expect(res.body.message).to.eql('Update Successful!');
           expect(res.body.user.id).to.equal(1);
@@ -174,7 +174,7 @@ describe('Users', () => {
         });
     });
   });
-  describe('delete a user by id', () => {
+  describe('DELETE: /users/:id', () => {
     it('should allow the admin delete a user', (done) => {
       chai.request(app)
         .delete('/api/v1/users/3')
@@ -207,8 +207,8 @@ describe('Users', () => {
         });
     });
   });
-  describe('search for a user by name or email', () => {
-    it('should allow the admin search for a user', (done) => {
+  describe('GET: /search/users/?q={}', () => {
+    it('should allow the admin search for a user by name', (done) => {
       chai.request(app)
         .get('/api/v1/search/users?search=john')
         .set({ 'Authorization': adminToken })
@@ -233,8 +233,8 @@ describe('Users', () => {
         });
     });
   });
-  describe('get all documents belonging to a user', () => {
-    it('should return all documents belonging to a user given an id', (done) => {
+  describe('GET: /users/:id/documents', () => {
+    it('should return all documents belonging to a user given the user id', (done) => {
       chai.request(app)
         .get('/api/v1/users/1/documents')
         .set({ Authorization: regularUserToken })
@@ -244,16 +244,6 @@ describe('Users', () => {
           expect(res.body.documents[0].title).to.eql('My first document');
           expect(res.body.documents[0].content).to.eql('lorem ipsum and the rest of it');
           expect(res.body.documents[0].OwnerId).to.equal(1);
-          done();
-        });
-    });
-    it('should return a message for invalid user id', (done) => {
-      chai.request(app)
-        .get('/api/v1/users/jkfjdkjfld/documents')
-        .set({ 'Authorization': adminToken })
-        .end((err, res) => {
-          expect(res.status).to.equal(400);
-          expect(err.response.text).to.eql('Error. Please check the id and try again');
           done();
         });
     });

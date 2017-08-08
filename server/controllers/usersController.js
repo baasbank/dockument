@@ -1,17 +1,14 @@
 import bcrypt from 'bcrypt';
-
-const jwt = require('jsonwebtoken');
+import jwt from 'jsonwebtoken';
+import db from '../models';
+import helper from '../helper/Helper';
 
 require('dotenv').config();
-
-const db = require('../models');
-const Helper = require('../helper/Helper');
 
 const secret = process.env.SECRET;
 const Role = db.Role;
 const User = db.User;
 const Document = db.Document;
-
 
 /**
  * usersController class to create and manage users
@@ -21,15 +18,14 @@ const Document = db.Document;
 class usersController {
 /**
    * Create a user
-   *
    * @static
    * @param {Object} req - Request object
    * @param {Object} res - Response object
-   * @returns {void}
+   * @returns {object} json - payload
    * @memberOf usersController
    */
   static createUser(req, res) {
-    if (req.body.name &&
+    if (req.body.fullName &&
         req.body.email &&
         req.body.password) {
       User.findOne({ where: { email: req.body.email } })
@@ -40,33 +36,21 @@ class usersController {
             });
           }
           User.create({
-            fullName: req.body.name,
+            fullName: req.body.fullName,
             email: req.body.email,
             password: req.body.password,
             roleType: 'regular user'
           })
-            .then((user) => {
-              const userData = {
-                userId: user.id,
-                fullName: user.fullName,
+            .then(user => res.status(201).send({
+              message: 'signup successful',
+              user: {
+                id: user.id,
+                name: user.fullName,
+                email: user.email,
                 roleType: user.roleType,
-              };
-
-              const token = jwt.sign(userData, secret, {
-                expiresIn: '48h'
-              });
-              res.status(201).send({
-                message: 'signup successful',
-                user: {
-                  id: user.id,
-                  name: user.name,
-                  email: user.email,
-                  roleType: user.roleType,
-                },
-                token
-              });
-            })
-            .catch(() => res.status(400).send({
+              }
+            }))
+            .catch(() => res.status(500).send({
               message: 'Error. Please try again.',
             }));
         }).catch((error) => {
@@ -85,7 +69,7 @@ class usersController {
    * @static
    * @param {Object} req - Request object
    * @param {Object} res - Response object
-   * @returns {void}
+   * @returns {object} json - payload 
    * @memberOf usersController
    */
   static login(req, res) {
@@ -118,12 +102,12 @@ class usersController {
     }
   }
   /**
-   * List all users
+   * Get all users
    *
    * @static
    * @param {Object} req - Request object
    * @param {Object} res - Response object
-   *@returns {void}
+   *@returns {object} json - payload
    * @memberOf usersController
    */
   static getAllUsers(req, res) {
@@ -152,7 +136,7 @@ class usersController {
       User
         .findAndCountAll(query)
         .then((users) => {
-          const pagination = Helper.pagination(
+          const pagination = helper.pagination(
             query.limit, query.offset, users.count
           );
           res.status(200).send({
@@ -167,8 +151,8 @@ class usersController {
    * @static
    * @param {Object} req - Request object
    * @param {Object} res - Response object
-   *@returns {void}
-   * @memberOf UsersController
+   *@returns {object} user - the user's details
+   * @memberOf usersController
    */
   static findAUser(req, res) {
     return User
@@ -236,12 +220,12 @@ class usersController {
                 password: req.body.password || user.password,
                 roleType: req.body.roleType || user.roleType,
               })
-              .then(() => res.status(205).send({
+              .then(() => res.status(200).send({
                 message: 'Update Successful!',
                 user,
               }));
           })
-          .catch(() => res.status(400).send(
+          .catch(() => res.status(500).send(
             'Error. Please try again.',
           ));
       });
@@ -252,7 +236,8 @@ class usersController {
     * Delete a user by id
     * @param {Object} req request object
     * @param {Object} res response object
-    * @returns {object} json - payload
+    * @returns {object} message - delete message
+    * @memberOf usersController
     */
   static deleteAUser(req, res) {
     User
@@ -281,7 +266,6 @@ class usersController {
    * @param {Object} req - Request object
    * @param {Object} res - Response object
    * @returns {object} json- payload
-   *
    * @memberOf usersController
    */
   static searchUsers(req, res) {
@@ -306,7 +290,7 @@ class usersController {
     User
       .findAndCountAll(query)
       .then((users) => {
-        const pagination = Helper.pagination(
+        const pagination = helper.pagination(
           query.limit, query.offset, users.count
         );
         if (!users.rows.length) {
@@ -351,7 +335,7 @@ class usersController {
             updatedAt: document.updatedAt,
           }));
 
-        const pagination = Helper.pagination(
+        const pagination = helper.pagination(
           query.limit, query.offset, documents.count
         );
         if (!documents.rows.length) {
@@ -369,4 +353,4 @@ class usersController {
   }
 }
 
-module.exports = usersController;
+export default usersController;

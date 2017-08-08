@@ -1,5 +1,5 @@
-const UsersController = require('../controllers/usersController');
-const authenticate = require('../middleware/authenticate');
+import usersController from '../controllers/usersController';
+import authenticate from '../middleware/authenticate';
 
 /**
  * @swagger
@@ -153,8 +153,8 @@ const usersRoute = (router) => {
  *         409:
  *           description: an existing item already exists
  */
-    .get(authenticate.verifyToken, authenticate.hasAdminAccess, UsersController.getAllUsers)
-    .post(UsersController.createUser);
+    .get(authenticate.verifyToken, authenticate.hasAdminAccess, usersController.getAllUsers)
+    .post(usersController.createUser);
 
   // Log a user in
   router.route('/users/login')
@@ -198,7 +198,7 @@ const usersRoute = (router) => {
  *         401:
  *           description: Invalid password or username
  */
-    .post(UsersController.login);
+    .post(usersController.login);
 
   // find a user, update user details, delete user.
   router.route('/users/:id')
@@ -308,9 +308,9 @@ const usersRoute = (router) => {
  *       security:
  *       - Authorization: [] 
  */         
-    .get(authenticate.verifyToken, UsersController.findAUser)
-    .put(authenticate.verifyToken, UsersController.updateUser)
-    .delete(authenticate.verifyToken, authenticate.hasAdminAccess, UsersController.deleteAUser);
+    .get(authenticate.verifyToken, usersController.findAUser)
+    .put(authenticate.verifyToken, usersController.updateUser)
+    .delete(authenticate.verifyToken, authenticate.hasAdminAccess, usersController.deleteAUser);
 
   // search for users by name
   router.route('/search/users/')
@@ -346,7 +346,7 @@ const usersRoute = (router) => {
  *       security:
  *       - Authorization: [] 
  */
-    .get(authenticate.verifyToken, authenticate.hasAdminAccess, UsersController.searchUsers);
+    .get(authenticate.verifyToken, authenticate.hasAdminAccess, usersController.searchUsers);
 
   // search for users' document  
   router.route('/users/:id/documents')
@@ -385,7 +385,7 @@ const usersRoute = (router) => {
  *       security:
  *       - Authorization: []
  */ 
-    .get(authenticate.verifyToken, UsersController.getUserDocuments);
+    .get(authenticate.verifyToken, usersController.getUserDocuments);
 };
 
-module.exports = usersRoute;
+export default usersRoute;
