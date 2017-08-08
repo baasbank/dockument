@@ -2,7 +2,7 @@ import chai from 'chai';
 import http from 'chai-http';
 import app from '../../../app';
 import models from '../../models/';
-import data from '../MockData';
+import data from '../mockData';
 
 
 const expect = chai.expect;
