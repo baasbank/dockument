@@ -1,5 +1,5 @@
 import db from '../models';
-import helper from '../helper/helper';
+import helper from '../helper/Helper';
 
 const Document = db.Document;
 

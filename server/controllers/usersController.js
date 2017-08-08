@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import db from '../models';
-import helper from '../helper/helper';
+import helper from '../helper/Helper';
 
 require('dotenv').config();
 
