@@ -78,7 +78,7 @@ describe('Users', () => {
       chai.request(app)
         .post('/api/v1/users/').send(fakeEsther).end((err, res) => {
           expect(res.status).to.equal(201);
-          expect(res.body).to.have.keys(['message', 'user', 'token']);
+          expect(res.body).to.have.keys(['message', 'user']);
           expect(res.body.message).to.eql('signup successful');
           done();
         });
@@ -152,7 +152,7 @@ describe('Users', () => {
         .send(updateUser)
         .set({ 'Authorization': adminToken })
         .end((err, res) => {
-          expect(res.status).to.equal(205);
+          expect(res.status).to.equal(200);
           expect(res.body).to.have.keys(['message', 'user']);
           expect(res.body.message).to.eql('Update Successful!');
           expect(res.body.user.id).to.equal(1);

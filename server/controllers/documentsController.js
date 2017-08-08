@@ -37,7 +37,7 @@ class DocumentsController {
             ownerId: document.UserId
           }
         }))
-        .catch(() => res.status(400).send({
+        .catch(() => res.status(500).send({
           message: 'Error. Please try again.',
         }));
     } else {
@@ -75,7 +75,7 @@ class DocumentsController {
               })
             });
         })
-        .catch(() => res.status(400).send({
+        .catch(() => res.status(500).send({
           message: 'An error occured.',
         }));
     } else {
@@ -182,11 +182,11 @@ class DocumentsController {
             message: 'Update Successful!',
             document,
           }))
-          .catch(() => res.status(400).send({
+          .catch(() => res.status(500).send({
             message: 'Error. Please try again.',
           }));
       })
-      .catch(() => res.status(400).send({
+      .catch(() => res.status(500).send({
         message: 'Error. Please try again.',
       }));
   }
@@ -220,7 +220,7 @@ class DocumentsController {
             message: 'Document deleted successfully.',
           }));
       })
-      .catch(() => res.status(400).send({
+      .catch(() => res.status(500).send({
         message: 'Error. Please try again.',
       }));
   }

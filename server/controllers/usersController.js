@@ -25,7 +25,7 @@ class UsersController {
    * @memberOf UsersController
    */
   static createUser(req, res) {
-    if (req.body.name &&
+    if (req.body.fullName &&
         req.body.email &&
         req.body.password) {
       User.findOne({ where: { email: req.body.email } })
@@ -36,33 +36,21 @@ class UsersController {
             });
           }
           User.create({
-            fullName: req.body.name,
+            fullName: req.body.fullName,
             email: req.body.email,
             password: req.body.password,
             roleType: 'regular user'
           })
-            .then((user) => {
-              const userData = {
-                userId: user.id,
-                fullName: user.fullName,
+            .then(user => res.status(201).send({
+              message: 'signup successful',
+              user: {
+                id: user.id,
+                name: user.fullName,
+                email: user.email,
                 roleType: user.roleType,
-              };
-
-              const token = jwt.sign(userData, secret, {
-                expiresIn: '48h'
-              });
-              res.status(201).send({
-                message: 'signup successful',
-                user: {
-                  id: user.id,
-                  name: user.name,
-                  email: user.email,
-                  roleType: user.roleType,
-                },
-                token
-              });
-            })
-            .catch(() => res.status(400).send({
+              }
+            }))
+            .catch(() => res.status(500).send({
               message: 'Error. Please try again.',
             }));
         }).catch((error) => {
@@ -232,12 +220,12 @@ class UsersController {
                 password: req.body.password || user.password,
                 roleType: req.body.roleType || user.roleType,
               })
-              .then(() => res.status(205).send({
+              .then(() => res.status(200).send({
                 message: 'Update Successful!',
                 user,
               }));
           })
-          .catch(() => res.status(400).send(
+          .catch(() => res.status(500).send(
             'Error. Please try again.',
           ));
       });

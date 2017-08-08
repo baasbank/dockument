@@ -29,7 +29,7 @@ export default {
     email: 'baasbank@test.com'
   },
   fakeEsther: {
-    name: faker.name.findName(),
+    fullName: faker.name.findName(),
     email: faker.internet.email(),
     password: 'esther',
   },
