@@ -25,7 +25,7 @@ export default {
     password: 'wrong'
   },
   updateUser: {
-    name: 'Baas my man Bank',
+    fullName: 'Baas my man Bank',
     email: 'baasbank@test.com'
   },
   fakeEsther: {

@@ -214,14 +214,19 @@ class UsersController {
             }
             user
               .update({
-                fullName: req.body.name || user.fullName,
+                fullName: req.body.fullName || user.fullName,
                 email: req.body.email || user.email,
                 password: req.body.password || user.password,
                 roleType: req.body.roleType || user.roleType,
               })
-              .then(() => res.status(200).send({
+              .then(updatedUser => res.status(200).send({
                 message: 'Update Successful!',
-                user,
+                user: {
+                  fullName: updatedUser.fullName,
+                  email: updatedUser.email,
+                  roleType: updatedUser.roleType,
+                  userId: updatedUser.id
+                }
               }));
           })
           .catch(() => res.status(500).send(

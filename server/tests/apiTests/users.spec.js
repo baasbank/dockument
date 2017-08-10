@@ -172,7 +172,7 @@ describe('Users', () => {
           expect(res.status).to.equal(200);
           expect(res.body).to.have.keys(['message', 'user']);
           expect(res.body.message).to.eql('Update Successful!');
-          expect(res.body.user.id).to.equal(1);
+          expect(res.body.user.userId).to.equal(1);
           expect(res.body.user.fullName).to.eql('Baas my man Bank');
           expect(res.body.user.email).to.eql('baasbank@test.com');
           done();
