@@ -26,7 +26,7 @@ class DocumentsController {
           title: req.body.title,
           content: req.body.content,
           accessType: req.body.accessType,
-          UserId: req.body.userId,
+          userId: req.body.userId,
         })
         .then(document => res.status(201).send({
           message: 'Document created.',
@@ -34,7 +34,7 @@ class DocumentsController {
             documentId: document.id,
             content: document.content,
             accessType: document.accessType,
-            ownerId: document.UserId
+            ownerId: document.userId
           }
         }))
         .catch(() => res.status(500).send({
@@ -69,7 +69,7 @@ class DocumentsController {
                     title: document.title,
                     content: document.content,
                     access: document.accessType,
-                    userId: document.UserId,
+                    userId: document.userId,
                   }
                 );
               })
@@ -126,7 +126,7 @@ class DocumentsController {
           title: document.title,
           content: document.content,
           access: document.accessType,
-          ownerId: document.UserId,
+          ownerId: document.userId,
         });
       })
       .catch((error) => {
@@ -152,7 +152,7 @@ class DocumentsController {
             message: 'Cannot find document',
           });
         }
-        if (req.decoded.userId !== document.UserId) {
+        if (req.decoded.userId !== document.userId) {
           return res.status(403).send({
             message: 'You can update only your documents.'
           });
@@ -164,19 +164,12 @@ class DocumentsController {
             'Document ID cannot be changed.',
           });
         }
-
-        if (req.body.UserId) {
-          return res.status(403).send({
-            message:
-            'User ID cannot be changed.',
-          });
-        }
         document
           .update({
             title: req.body.title || document.title,
             content: req.body.content || document.content,
             access: req.body.accessType || document.accessType,
-            userId: document.UserId,
+            userId: document.userId,
           })
           .then(() => res.status(200).send({
             message: 'Update Successful!',
@@ -209,7 +202,7 @@ class DocumentsController {
           });
         }
 
-        if (req.decoded.userId !== document.UserId) {
+        if (req.decoded.userId !== document.userId) {
           return res.status(403).send({
             message: 'You can delete only your documents.'
           });

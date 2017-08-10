@@ -140,18 +140,6 @@ describe('Documents', () => {
           done();
         });
     });
-    it('should not allow a user update her id', (done) => {
-      chai.request(app)
-        .put('/api/v1/documents/4')
-        .send({ UserId: 5 })
-        .set({ 'Authorization': superUserToken })
-        .end((err, res) => {
-          expect(res.status).to.equal(403);
-          expect(res.body).to.have.keys(['message']);
-          expect(res.body.message).to.eql('User ID cannot be changed.');
-          done();
-        });
-    });
   });
   describe('DELETE: /documents/:id', () => {
     it('should allow the owner of a document delete it', (done) => {

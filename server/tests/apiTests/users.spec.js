@@ -173,6 +173,18 @@ describe('Users', () => {
           done();
         });
     });
+    it('should not allow a user update her id', (done) => {
+      chai.request(app)
+        .put('/api/v1/users/4')
+        .send({ id: 5 })
+        .set({ 'Authorization': regularUserToken })
+        .end((err, res) => {
+          expect(res.status).to.equal(403);
+          expect(res.body).to.have.keys(['message']);
+          expect(res.body.message).to.eql('User ID cannot be updated.');
+          done();
+        });
+    });
   });
   describe('DELETE: /users/:id', () => {
     it('should allow the admin delete a user', (done) => {

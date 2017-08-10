@@ -26,7 +26,7 @@ module.exports = (sequelize, DataTypes) => {
         isIn: [['private', 'public', 'role']],
       },
     },
-    UserId: {
+    userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
@@ -34,7 +34,7 @@ module.exports = (sequelize, DataTypes) => {
     classMethods: {
       associate: (models) => {
         Document.belongsTo(models.User, {
-          foreignKey: 'UserId',
+          foreignKey: 'userId',
           onDelete: 'CASCADE',
         });
       }

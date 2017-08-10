@@ -316,7 +316,7 @@ class UsersController {
   static getUserDocuments(req, res) {
     const query = {
       where: {
-        UserId: { $eq: req.params.id },
+        userId: { $eq: req.params.id },
       }
     };
     query.limit = (req.query.limit > 0) ? req.query.limit : 5;
@@ -330,7 +330,7 @@ class UsersController {
             title: document.title,
             content: document.content,
             access: document.accessType,
-            OwnerId: document.UserId,
+            OwnerId: document.userId,
             createdAt: document.createdAt,
             updatedAt: document.updatedAt,
           }));
