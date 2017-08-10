@@ -44,8 +44,8 @@ const hasAdminAccess = (req, res, next) => {
   if (req.decoded.roleType === 'admin') {
     next();
   } else {
-    return res.status(401).json({
-      message: 'No authorization',
+    return res.status(403).json({
+      message: 'Only an admin can access this resource.',
     });
   }
 };
