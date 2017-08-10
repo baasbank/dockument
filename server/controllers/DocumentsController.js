@@ -1,7 +1,7 @@
-import db from '../models';
+import models from '../models';
 import Helper from '../helper/Helper';
 
-const Document = db.Document;
+const Document = models.Document;
 
 /**
  * class to create and manage documents

@@ -1,6 +1,6 @@
-import db from '../models';
+import models from '../models';
 
-const Role = db.Role;
+const Role = models.Role;
 
 /**
  * class to create roles

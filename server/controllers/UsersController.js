@@ -1,14 +1,14 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import db from '../models';
+import models from '../models';
 import helper from '../helper/Helper';
 
 require('dotenv').config();
 
 const secret = process.env.SECRET;
-const Role = db.Role;
-const User = db.User;
-const Document = db.Document;
+const Role = models.Role;
+const User = models.User;
+const Document = models.Document;
 
 /**
  * UsersController class to create and manage users
