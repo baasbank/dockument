@@ -61,6 +61,5 @@ export default {
   fakeDocument: {
     title: faker.lorem.word(),
     content: faker.lorem.paragraph(),
-    accessType: 'public'
   }
 };

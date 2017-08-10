@@ -11,7 +11,7 @@ chai.use(http);
 const { admin,
   regularUser,
   superUser,
-  incompleteLoginCredentials, 
+  incompleteLoginCredentials,
   fakeEsther,
   fakeUserDetails,
   updateUser,
