@@ -16,18 +16,18 @@ const Document = db.Document;
  * @class UsersController
  */
 class UsersController {
-/**
-   * Create a user
-   * @static
-   * @param {Object} req - Request object
-   * @param {Object} res - Response object
-   * @returns {object} json - payload
-   * @memberOf UsersController
-   */
+  /**
+     * Create a user
+     * @static
+     * @param {Object} req - Request object
+     * @param {Object} res - Response object
+     * @returns {object} json - payload
+     * @memberOf UsersController
+     */
   static createUser(req, res) {
     if (req.body.fullName &&
-        req.body.email &&
-        req.body.password) {
+      req.body.email &&
+      req.body.password) {
       User.findOne({ where: { email: req.body.email } })
         .then((existingUser) => {
           if (existingUser) {
@@ -313,42 +313,48 @@ class UsersController {
    * @memberOf UsersController
    */
   static getUserDocuments(req, res) {
-    const query = {
-      where: {
-        userId: { $eq: req.params.id },
-      }
-    };
-    query.limit = (req.query.limit > 0) ? req.query.limit : 5;
-    query.offset = (req.query.offset > 0) ? req.query.offset : 0;
-    Document
-      .findAndCountAll(query)
-      .then((documents) => {
-        const mappedDocuments = documents.rows
-          .map(document => ({
-            id: document.id,
-            title: document.title,
-            content: document.content,
-            access: document.accessType,
-            OwnerId: document.userId,
-            createdAt: document.createdAt,
-            updatedAt: document.updatedAt,
-          }));
-
-        const pagination = helper.paginate(
-          query.limit, query.offset, documents.count
-        );
-        if (!documents.rows.length) {
-          return res.status(404).send({
-            message: 'No document matches the request.',
-          });
+    if ((parseInt(req.params.id, 10) === req.decoded.userId) || (req.decoded.roleType === 'admin')) {
+      const query = {
+        where: {
+          userId: { $eq: req.params.id },
         }
-        res.status(200).send({
-          pagination, documents: mappedDocuments,
-        });
-      })
-      .catch(() => res.status(400).send(
-        'Error. Please check the id and try again'
-      ));
+      };
+      query.limit = (req.query.limit > 0) ? req.query.limit : 5;
+      query.offset = (req.query.offset > 0) ? req.query.offset : 0;
+      Document
+        .findAndCountAll(query)
+        .then((documents) => {
+          const mappedDocuments = documents.rows
+            .map(document => ({
+              id: document.id,
+              title: document.title,
+              content: document.content,
+              access: document.accessType,
+              OwnerId: document.userId,
+              createdAt: document.createdAt,
+              updatedAt: document.updatedAt,
+            }));
+
+          const pagination = helper.paginate(
+            query.limit, query.offset, documents.count
+          );
+          if (!documents.rows.length) {
+            return res.status(404).send({
+              message: 'No document matches the request.',
+            });
+          }
+          res.status(200).send({
+            pagination, documents: mappedDocuments,
+          });
+        })
+        .catch(() => res.status(400).send(
+          'Error. Please check the id and try again'
+        ));
+    } else {
+      return res.status(403).send({
+        message: 'You cannot view another user documents.',
+      });
+    }
   }
 }
 

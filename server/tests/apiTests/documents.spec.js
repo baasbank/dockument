@@ -61,7 +61,7 @@ describe('Documents', () => {
     it('should display all documents', (done) => {
       chai.request(app)
         .get('/api/v1/documents')
-        .set({ 'Authorization': superUserToken })
+        .set({ 'Authorization': adminToken })
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(Array.isArray(res.body.allDocuments));
@@ -72,7 +72,7 @@ describe('Documents', () => {
     it('should fetch and paginate all documents when limit and offset are supplied', (done) => {
       chai.request(app)
         .get('/api/v1/documents?limit=2&offset=0')
-        .set({ 'Authorization': superUserToken })
+        .set({ 'Authorization': adminToken })
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body).to.have.keys(['pagination', 'documents']);

@@ -8,9 +8,18 @@ import mockData from '../MockData';
 const expect = chai.expect;
 chai.use(http);
 
-const { admin, regularUser, incompleteLoginCredentials, fakeEsther, fakeUserDetails, updateUser, userPasswordMismatch } = mockData;
+const { admin,
+  regularUser,
+  superUser,
+  incompleteLoginCredentials, 
+  fakeEsther,
+  fakeUserDetails,
+  updateUser,
+  userPasswordMismatch } = mockData;
 
-let adminToken, regularUserToken;
+let adminToken;
+let regularUserToken;
+let superUserToken;
 
 describe('Users', () => {
   before((done) => {
@@ -31,6 +40,15 @@ describe('Users', () => {
         done();
       });
   });
+  before((done) => {
+    chai.request(app)
+      .post('/api/v1/users/login')
+      .send(superUser)
+      .end((err, res) => {
+        superUserToken = res.body.token;
+        done();
+      });
+  });
   after((done) => {
     models.User.destroy({ where: { id: { $notIn: [1, 2, 3, 4, 5] } } });
     done();
@@ -40,8 +58,7 @@ describe('Users', () => {
       chai.request(app)
         .post('/api/v1/users/login').send(admin).end((err, res) => {
           expect(res.status).to.equal(200);
-          expect(res.body).to.have.keys(['message', 'token']);
-          expect(res.body.message).to.eql('login successful');
+          expect(res.body).to.have.keys(['token']);
           done();
         });
     });
@@ -96,17 +113,17 @@ describe('Users', () => {
           done();
         });
     });
-    it('should return a message if a regular user accesses it', (done) => {
-      chai.request(app)
-        .get('/api/v1/users')
-        .set({ 'Authorization': regularUserToken })
-        .end((err, res) => {
-          expect(res.status).to.equal(401);
-          expect(res.body).to.have.keys(['message']);
-          expect(res.body.message).to.eql('No authorization');
-          done();
-        });
-    });
+    // it('should return a message if a regular user accesses it', (done) => {
+    //   chai.request(app)
+    //     .get('/api/v1/users')
+    //     .set({ 'Authorization': regularUserToken })
+    //     .end((err, res) => {
+    //       expect(res.status).to.equal(401);
+    //       expect(res.body).to.have.keys(['message']);
+    //       expect(res.body.message).to.eql('No authorization');
+    //       done();
+    //     });
+    // });
     it('should paginate users if user is admin and limit and query is supplied', (done) => {
       chai.request(app)
         .get('/api/v1/users?limit=2&offset=0')
@@ -249,7 +266,7 @@ describe('Users', () => {
     it('should return all documents belonging to a user given the user id', (done) => {
       chai.request(app)
         .get('/api/v1/users/1/documents')
-        .set({ Authorization: regularUserToken })
+        .set({ Authorization: adminToken })
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body).to.have.keys(['pagination', 'documents']);
@@ -266,6 +283,17 @@ describe('Users', () => {
         .end((err, res) => {
           expect(res.status).to.equal(404);
           expect(res.body.message).to.eql('No document matches the request.');
+          done();
+        });
+    });
+    it('should not allow a user view all of another user documents', (done) => {
+      chai.request(app)
+        .get('/api/v1/users/1/documents')
+        .set({ Authorization: superUserToken })
+        .end((err, res) => {
+          expect(res.status).to.equal(403);
+          expect(res.body).to.have.keys(['message']);
+          expect(res.body.message).to.eql('You cannot view another user documents.');
           done();
         });
     });
