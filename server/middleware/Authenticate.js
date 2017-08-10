@@ -13,11 +13,11 @@ const secret = process.env.SECRET;
    */
 
 const verifyToken = (req, res, next) => {
-  const token = req.headers.authorization || req.headers['x-access-token'];
+  const token = req.headers.authorization;
   if (token) {
     jwt.verify(token, secret, (err, decoded) => {
       if (err) {
-        res.json({ success: false, message: 'Could not authenticate token.' });
+        res.json({ message: 'Could not authenticate token.' });
       } else {
         req.decoded = decoded;
         next();
