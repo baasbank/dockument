@@ -176,6 +176,18 @@ class DocumentsController {
             'Document ID cannot be changed.',
           });
         }
+        if (req.body.createdAt) {
+          return res.status(403).send({
+            message:
+            'createdAt date cannot be changed.',
+          });
+        }
+        if (req.body.updatedAt) {
+          return res.status(403).send({
+            message:
+            'updatedAt date cannot be changed.',
+          });
+        }
         document
           .update({
             title: req.body.title || document.title,
