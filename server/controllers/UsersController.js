@@ -89,8 +89,7 @@ class UsersController {
             const token = jwt.sign(userData, secret, {
               expiresIn: '48h'
             });
-            res.status(201).json({
-              message: 'login successful',
+            res.status(200).json({
               token
             });
           } else {

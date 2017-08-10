@@ -39,7 +39,7 @@ describe('Users', () => {
     it('should log in a user and return a token', (done) => {
       chai.request(app)
         .post('/api/v1/users/login').send(admin).end((err, res) => {
-          expect(res.status).to.equal(201);
+          expect(res.status).to.equal(200);
           expect(res.body).to.have.keys(['message', 'token']);
           expect(res.body.message).to.eql('login successful');
           done();
