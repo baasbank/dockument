@@ -68,8 +68,7 @@ app.get('*', (req, res) => res.status(200).send({
 const port = parseInt(process.env.PORT, 10) || 8000;
 app.set('port', port);
 
-const server = http.createServer(app);
-server.listen(port, () => {
+app.listen(port, () => {
   winston.info(`The server is running on localhost:${port}`);
 });
 
