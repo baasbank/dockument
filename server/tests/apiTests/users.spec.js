@@ -252,7 +252,7 @@ describe('Users', () => {
   describe('GET: /search/users/?q={}', () => {
     it('should allow the admin search for a user by name', (done) => {
       chai.request(app)
-        .get('/api/v1/search/users?search=john')
+        .get('/api/v1/search/users?q=john')
         .set({ 'Authorization': adminToken })
         .end((err, res) => {
           expect(res.status).to.equal(200);
@@ -265,7 +265,7 @@ describe('Users', () => {
     });
     it('should return a message if no user is found', (done) => {
       chai.request(app)
-        .get('/api/v1/search/users?search=temilaj')
+        .get('/api/v1/search/users?q=temilaj')
         .set({ 'Authorization': adminToken })
         .end((err, res) => {
           expect(res.status).to.equal(404);

@@ -287,7 +287,7 @@ class UsersController {
    * @memberOf UsersController
    */
   static searchUsers(req, res) {
-    const searchTerm = req.query.search.trim();
+    const searchTerm = req.query.q.trim();
 
     const query = {
       where: {

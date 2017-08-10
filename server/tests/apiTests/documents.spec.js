@@ -168,7 +168,7 @@ describe('Documents', () => {
   describe('GET: /search/documents/?q={doctitle}', () => {
     it('should allow a user search for documents by title', (done) => {
       chai.request(app)
-        .get('/api/v1/search/documents?search=first')
+        .get('/api/v1/search/documents?q=first')
         .set({ 'Authorization': superUserToken })
         .end((err, res) => {
           expect(res.status).to.equal(200);
@@ -179,7 +179,7 @@ describe('Documents', () => {
     });
     it('should return a message when document is not found', (done) => {
       chai.request(app)
-        .get('/api/v1/search/documents?search=firsthead')
+        .get('/api/v1/search/documents?q=firsthead')
         .set({ 'Authorization': superUserToken })
         .end((err, res) => {
           expect(res.status).to.equal(200);
