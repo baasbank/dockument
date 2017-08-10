@@ -199,6 +199,20 @@ class UsersController {
               });
             }
 
+            if (req.body.createdAt) {
+              return res.status(403).send({
+                message:
+                'createdAt date cannot be changed.',
+              });
+            }
+
+            if (req.body.updatedAt) {
+              return res.status(403).send({
+                message:
+                'updatedAt date cannot be changed.',
+              });
+            }
+
             if ((role.roleType !== 'admin') && (req.body.roleType)) {
               return res.status(403).send({
                 message:
