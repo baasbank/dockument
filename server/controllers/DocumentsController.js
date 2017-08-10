@@ -41,7 +41,7 @@ class DocumentsController {
       })
       .then(document => res.status(201).send({
         message: 'Document created.',
-        details: {
+        document: {
           documentId: document.id,
           title: document.title,
           content: document.content,

@@ -39,8 +39,8 @@ describe('Documents', () => {
         .set({ 'Authorization': superUserToken })
         .end((err, res) => {
           expect(res.status).to.equal(201);
-          expect(res.body).to.have.keys(['message', 'details']);
-          expect(res.body.details.ownerId).to.equal(2);
+          expect(res.body).to.have.keys(['message', 'document']);
+          expect(res.body.document.ownerId).to.equal(2);
           done();
         });
     });
