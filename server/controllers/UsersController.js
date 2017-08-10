@@ -340,7 +340,7 @@ class UsersController {
           );
           if (!documents.rows.length) {
             return res.status(404).send({
-              message: 'No document matches the request.',
+              message: 'This user does not have any document.',
             });
           }
           res.status(200).send({

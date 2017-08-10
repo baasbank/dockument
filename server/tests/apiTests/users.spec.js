@@ -282,7 +282,7 @@ describe('Users', () => {
         .set({ 'Authorization': adminToken })
         .end((err, res) => {
           expect(res.status).to.equal(404);
-          expect(res.body.message).to.eql('No document matches the request.');
+          expect(res.body.message).to.eql('This user does not have any document.');
           done();
         });
     });
