@@ -1,5 +1,5 @@
-import usersController from '../controllers/usersController';
-import authenticate from '../middleware/authenticate';
+import UsersController from '../controllers/UsersController';
+import Authenticate from '../middleware/Authenticate';
 
 /**
  * @swagger
@@ -82,7 +82,7 @@ import authenticate from '../middleware/authenticate';
  * @param {function} router
  * @returns {void}
  */
-const usersRoute = (router) => {
+const UsersRoute = (router) => {
   // Create a new user, and get all users
   router.route('/users/')
 /**
@@ -153,8 +153,8 @@ const usersRoute = (router) => {
  *         409:
  *           description: an existing item already exists
  */
-    .get(authenticate.verifyToken, authenticate.hasAdminAccess, usersController.getAllUsers)
-    .post(usersController.createUser);
+    .get(Authenticate.verifyToken, Authenticate.hasAdminAccess, UsersController.getAllUsers)
+    .post(UsersController.createUser);
 
   // Log a user in
   router.route('/users/login')
@@ -198,7 +198,7 @@ const usersRoute = (router) => {
  *         401:
  *           description: Invalid password or username
  */
-    .post(usersController.login);
+    .post(UsersController.login);
 
   // find a user, update user details, delete user.
   router.route('/users/:id')
@@ -308,9 +308,9 @@ const usersRoute = (router) => {
  *       security:
  *       - Authorization: [] 
  */         
-    .get(authenticate.verifyToken, usersController.findAUser)
-    .put(authenticate.verifyToken, usersController.updateUser)
-    .delete(authenticate.verifyToken, authenticate.hasAdminAccess, usersController.deleteAUser);
+    .get(Authenticate.verifyToken, UsersController.findAUser)
+    .put(Authenticate.verifyToken, UsersController.updateUser)
+    .delete(Authenticate.verifyToken, Authenticate.hasAdminAccess, UsersController.deleteAUser);
 
   // search for users by name
   router.route('/search/users/')
@@ -346,7 +346,7 @@ const usersRoute = (router) => {
  *       security:
  *       - Authorization: [] 
  */
-    .get(authenticate.verifyToken, authenticate.hasAdminAccess, usersController.searchUsers);
+    .get(Authenticate.verifyToken, Authenticate.hasAdminAccess, UsersController.searchUsers);
 
   // search for users' document  
   router.route('/users/:id/documents')
@@ -385,7 +385,7 @@ const usersRoute = (router) => {
  *       security:
  *       - Authorization: []
  */ 
-    .get(authenticate.verifyToken, usersController.getUserDocuments);
+    .get(Authenticate.verifyToken, UsersController.getUserDocuments);
 };
 
-export default usersRoute;
+export default UsersRoute;

@@ -11,18 +11,18 @@ const User = db.User;
 const Document = db.Document;
 
 /**
- * usersController class to create and manage users
+ * UsersController class to create and manage users
  *
- * @class usersController
+ * @class UsersController
  */
-class usersController {
+class UsersController {
 /**
    * Create a user
    * @static
    * @param {Object} req - Request object
    * @param {Object} res - Response object
    * @returns {object} json - payload
-   * @memberOf usersController
+   * @memberOf UsersController
    */
   static createUser(req, res) {
     if (req.body.fullName &&
@@ -70,7 +70,7 @@ class usersController {
    * @param {Object} req - Request object
    * @param {Object} res - Response object
    * @returns {object} json - payload 
-   * @memberOf usersController
+   * @memberOf UsersController
    */
   static login(req, res) {
     if (!(req.body.password) || !(req.body.email)) {
@@ -108,7 +108,7 @@ class usersController {
    * @param {Object} req - Request object
    * @param {Object} res - Response object
    *@returns {object} json - payload
-   * @memberOf usersController
+   * @memberOf UsersController
    */
   static getAllUsers(req, res) {
     if ((!req.query.limit) && (!req.query.offset)) {
@@ -152,7 +152,7 @@ class usersController {
    * @param {Object} req - Request object
    * @param {Object} res - Response object
    *@returns {object} user - the user's details
-   * @memberOf usersController
+   * @memberOf UsersController
    */
   static findAUser(req, res) {
     return User
@@ -180,7 +180,7 @@ class usersController {
    * @param {Object} req - Request object
    * @param {Object} res - Response object
    * @returns {object} json - payload
-   * @memberOf usersController
+   * @memberOf UsersController
    */
   static updateUser(req, res) {
     Role.findOne({ where: { roleType: req.decoded.roleType } })
@@ -237,7 +237,7 @@ class usersController {
     * @param {Object} req request object
     * @param {Object} res response object
     * @returns {object} message - delete message
-    * @memberOf usersController
+    * @memberOf UsersController
     */
   static deleteAUser(req, res) {
     User
@@ -266,7 +266,7 @@ class usersController {
    * @param {Object} req - Request object
    * @param {Object} res - Response object
    * @returns {object} json- payload
-   * @memberOf usersController
+   * @memberOf UsersController
    */
   static searchUsers(req, res) {
     const searchTerm = req.query.search.trim();
@@ -311,7 +311,7 @@ class usersController {
    * @param {Object} req - Request object
    * @param {Object} res - Response object
    * @returns {object} json - payload
-   * @memberOf usersController
+   * @memberOf UsersController
    */
   static getUserDocuments(req, res) {
     const query = {
@@ -353,4 +353,4 @@ class usersController {
   }
 }
 
-export default usersController;
+export default UsersController;

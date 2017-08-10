@@ -1,12 +1,12 @@
 import chai from 'chai';
 import http from 'chai-http';
 import app from '../../../app';
-import data from '../mockData';
+import mockData from '../MockData';
 
 const expect = chai.expect;
 chai.use(http);
 
-const { superUser, admin, documentOne, updateDocument, fakeDocument } = data;
+const { superUser, admin, documentOne, updateDocument, fakeDocument } = mockData;
 
 let superUserToken, adminToken;
 

@@ -1,16 +1,16 @@
 /**
  * helper class for controllers
  *
- * @class helper
+ * @class Helper
  */
-class helper {
+class Helper {
   /**
    * @static
    * @param {integer} limit - max no. per page
    * @param {integer} offset - no. to offset by
    * @param {integer} count - total no. of records
    * @returns {Object} - returns pagination result
-   * @memberOf helper
+   * @memberOf Helper
    */
   static pagination(limit, offset, count) {
     /** totalCount : total number of records based on query
@@ -34,4 +34,4 @@ class helper {
   }
 }
 
-export default helper;
+export default Helper;

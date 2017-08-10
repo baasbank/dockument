@@ -1,6 +1,6 @@
-import rolesRoute from './rolesRoutes';
-import usersRoute from './usersRoutes';
-import documentsRoute from './documentsRoutes';
+import RolesRoute from './RolesRoutes';
+import UsersRoute from './UsersRoutes';
+import DocumentsRoute from './DocumentsRoutes';
 
 /**
  * Combine roles, documents and users routes
@@ -8,9 +8,9 @@ import documentsRoute from './documentsRoutes';
  * @returns {void}
  */
 const routes = (router) => {
-  rolesRoute(router);
-  usersRoute(router);
-  documentsRoute(router);
+  RolesRoute(router);
+  UsersRoute(router);
+  DocumentsRoute(router);
 };
 
 export default routes;

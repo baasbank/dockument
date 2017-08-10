@@ -5,7 +5,7 @@ import express from 'express';
 import logger from 'morgan';
 import bodyParser from 'body-parser';
 import http from 'http';
-import routes from './server/routes/';
+import routes from './server/routes/Index';
 
 // Set up the express app
 const app = express();
