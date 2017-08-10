@@ -202,14 +202,14 @@ class UsersController {
             if ((role.roleType !== 'admin') && (req.body.roleType)) {
               return res.status(403).send({
                 message:
-                'You do not have permission to update this property.',
+                'You cannot update your role type.',
               });
             }
 
             if ((role.roleType !== 'admin') && (req.decoded.userId !== user.id)) {
               return res.status(403).send({
                 message:
-                'You do not have permission to update.',
+                'You can update only your profile.',
               });
             }
             user

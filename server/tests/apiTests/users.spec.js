@@ -186,7 +186,7 @@ describe('Users', () => {
         .end((err, res) => {
           expect(res.status).to.equal(403);
           expect(res.body).to.have.keys(['message']);
-          expect(res.body.message).to.eql('You do not have permission to update.');
+          expect(res.body.message).to.eql('You can update only your profile.');
           done();
         });
     });
@@ -199,6 +199,19 @@ describe('Users', () => {
           expect(res.status).to.equal(403);
           expect(res.body).to.have.keys(['message']);
           expect(res.body.message).to.eql('User ID cannot be updated.');
+          done();
+        });
+    });
+    it('should allow an admin update a user role type', (done) => {
+      chai.request(app)
+        .put('/api/v1/users/3')
+        .send({ roleType: 'super user' })
+        .set({ 'Authorization': adminToken })
+        .end((err, res) => {
+          expect(res.status).to.equal(200);
+          expect(res.body).to.have.keys(['message', 'user']);
+          expect(res.body.message).to.eql('Update Successful!');
+          expect(res.body.user.roleType).to.eql('super user');
           done();
         });
     });
