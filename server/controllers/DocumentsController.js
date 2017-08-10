@@ -60,6 +60,11 @@ class DocumentsController {
     if ((!req.query.limit) && (!req.query.offset)) {
       Document.findAll()
         .then((documents) => {
+          if (!documents) {
+            return res.status(404).send({
+              message: 'No documents found.'
+            });
+          }
           res.status(200).send(
             {
               allDocuments:
