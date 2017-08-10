@@ -136,7 +136,7 @@ class UsersController {
       User
         .findAndCountAll(query)
         .then((users) => {
-          const pagination = helper.pagination(
+          const pagination = helper.paginate(
             query.limit, query.offset, users.count
           );
           res.status(200).send({
@@ -290,7 +290,7 @@ class UsersController {
     User
       .findAndCountAll(query)
       .then((users) => {
-        const pagination = helper.pagination(
+        const pagination = helper.paginate(
           query.limit, query.offset, users.count
         );
         if (!users.rows.length) {
@@ -335,7 +335,7 @@ class UsersController {
             updatedAt: document.updatedAt,
           }));
 
-        const pagination = helper.pagination(
+        const pagination = helper.paginate(
           query.limit, query.offset, documents.count
         );
         if (!documents.rows.length) {

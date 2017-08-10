@@ -12,7 +12,7 @@ class Helper {
    * @returns {Object} - returns pagination result
    * @memberOf Helper
    */
-  static pagination(limit, offset, count) {
+  static paginate(limit, offset, count) {
     /** totalCount : total number of records based on query
      * pageCount : total number of pages
      * currentPage : current page of the query result based on limit and offset

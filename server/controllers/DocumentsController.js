@@ -1,5 +1,5 @@
 import db from '../models';
-import helper from '../helper/Helper';
+import Helper from '../helper/Helper';
 
 const Document = db.Document;
 
@@ -85,7 +85,7 @@ class DocumentsController {
       Document
         .findAndCountAll(query)
         .then((documents) => {
-          const pagination = helper.pagination(
+          const pagination = Helper.paginate(
             query.limit, query.offset, documents.count
           );
           res.status(200).send({
@@ -244,7 +244,7 @@ class DocumentsController {
     Document
       .findAndCountAll(query)
       .then((documents) => {
-        const pagination = helper.pagination(
+        const pagination = Helper.paginate(
           query.limit, query.offset, documents.count
         );
         if (!documents.rows.length) {
