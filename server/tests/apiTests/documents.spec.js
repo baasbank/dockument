@@ -50,9 +50,9 @@ describe('Documents', () => {
         .send(fakeDocument)
         .set({ 'Authorization': superUserToken })
         .end((err, res) => {
-          expect(res.status).to.equal(206);
+          expect(res.status).to.equal(400);
           expect(res.body).to.have.keys(['message']);
-          expect(res.body.message).to.eql('All fields are required.');
+          expect(res.body.message).to.eql('accessType field is required.');
           done();
         });
     });

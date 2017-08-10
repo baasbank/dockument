@@ -17,34 +17,41 @@ class DocumentsController {
    * @memberOf DocumentsController
    */
   static createDocument(req, res) {
-    if (req.body.title &&
-        req.body.content &&
-        req.body.accessType &&
-        req.body.userId) {
-      Document
-        .create({
-          title: req.body.title,
-          content: req.body.content,
-          accessType: req.body.accessType,
-          userId: req.body.userId,
-        })
-        .then(document => res.status(201).send({
-          message: 'Document created.',
-          details: {
-            documentId: document.id,
-            content: document.content,
-            accessType: document.accessType,
-            ownerId: document.userId
-          }
-        }))
-        .catch(() => res.status(500).send({
-          message: 'Error. Please try again.',
-        }));
-    } else {
-      return res.status(206).send({
-        message: 'All fields are required.'
+    if (!req.body.title) {
+      return res.status(400).send({
+        message: 'Title field is required.'
       });
     }
+    if (!req.body.content) {
+      return res.status(400).send({
+        message: 'Content field is required.'
+      });
+    }
+    if (!req.body.accessType) {
+      return res.status(400).send({
+        message: 'accessType field is required.'
+      });
+    }
+    Document
+      .create({
+        title: req.body.title,
+        content: req.body.content,
+        accessType: req.body.accessType,
+        userId: req.decoded.userId,
+      })
+      .then(document => res.status(201).send({
+        message: 'Document created.',
+        details: {
+          documentId: document.id,
+          title: document.title,
+          content: document.content,
+          accessType: document.accessType,
+          ownerId: document.userId
+        }
+      }))
+      .catch(() => res.status(500).send({
+        message: 'Error. Please try again.',
+      }));
   }
 
   /**
