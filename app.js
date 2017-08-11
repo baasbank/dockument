@@ -61,8 +61,8 @@ app.get('/swagger.json', (req, res) => {
 });
 
 // Send a default catch-all route
-app.get('*', (req, res) => res.status(200).send({
-  message: 'Error. Please check and try again.',
+app.get('*', (req, res) => res.status(404).send({
+  message: 'Error. Please check the URL and try again.',
 }));
 
 const port = parseInt(process.env.PORT, 10) || 8000;
