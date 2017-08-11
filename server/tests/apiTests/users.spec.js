@@ -11,9 +11,7 @@ chai.use(http);
 const { admin,
   regularUser,
   superUser,
-  incompleteLoginCredentials,
   fakeEsther,
-  fakeUserDetails,
   updateUser,
   userPasswordMismatch } = mockData;
 
@@ -56,24 +54,40 @@ describe('Users', () => {
   describe('POST: /users/login', () => {
     it('should log in a user and return a token', (done) => {
       chai.request(app)
-        .post('/api/v1/users/login').send(admin).end((err, res) => {
+        .post('/api/v1/users/login')
+        .send(admin).end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body).to.have.keys(['token']);
           done();
         });
     });
-    it('should return a message for incomplete login details', (done) => {
+    it('should return a message if password field is not supplied', (done) => {
       chai.request(app)
-        .post('/api/v1/users/login').send(incompleteLoginCredentials).end((err, res) => {
+        .post('/api/v1/users/login')
+        .send({ email: 'testing@test.com' })
+        .end((err, res) => {
           expect(res.status).to.equal(400);
           expect(res.body).to.have.keys(['message']);
-          expect(res.body.message).to.eql('All fields are required');
+          expect(res.body.message).to.eql('password field is required.');
+          done();
+        });
+    });
+    it('should return a message if email field is not supplied', (done) => {
+      chai.request(app)
+        .post('/api/v1/users/login')
+        .send({ password: 'testing123' })
+        .end((err, res) => {
+          expect(res.status).to.equal(400);
+          expect(res.body).to.have.keys(['message']);
+          expect(res.body.message).to.eql('email field is required.');
           done();
         });
     });
     it('should return a message for password mismatch', (done) => {
       chai.request(app)
-        .post('/api/v1/users/login').send(userPasswordMismatch).end((err, res) => {
+        .post('/api/v1/users/login')
+        .send(userPasswordMismatch)
+        .end((err, res) => {
           expect(res.status).to.equal(401);
           expect(res.body).to.have.keys(['message']);
           expect(res.body.message).to.eql('Invalid login credentials. Try again.');
@@ -82,18 +96,43 @@ describe('Users', () => {
     });
   });
   describe('POST: /users/', () => {
-    it('should return a message for incomplete user details', (done) => {
+    it('should return a message if fullName field is not supplied', (done) => {
       chai.request(app)
-        .post('/api/v1/users/').send(fakeUserDetails).end((err, res) => {
-          expect(res.status).to.equal(206);
+        .post('/api/v1/users/')
+        .send({ email: 'femi@test.com', password: 'femi' })
+        .end((err, res) => {
+          expect(res.status).to.equal(400);
           expect(res.body).to.have.keys(['message']);
-          expect(res.body.message).to.eql('All fields are required.');
+          expect(res.body.message).to.eql('fullName field is required.');
+          done();
+        });
+    });
+    it('should return a message if email field is not supplied', (done) => {
+      chai.request(app)
+        .post('/api/v1/users/')
+        .send({ fullName: 'Oluwafemi Medale', password: 'femi' })
+        .end((err, res) => {
+          expect(res.status).to.equal(400);
+          expect(res.body).to.have.keys(['message']);
+          expect(res.body.message).to.eql('email field is required.');
+          done();
+        });
+    });
+    it('should return a message if password field is not supplied', (done) => {
+      chai.request(app)
+        .post('/api/v1/users/')
+        .send({ fullName: 'Oluwafemi Medale', email: 'femi@test.com' })
+        .end((err, res) => {
+          expect(res.status).to.equal(400);
+          expect(res.body).to.have.keys(['message']);
+          expect(res.body.message).to.eql('password field is required.');
           done();
         });
     });
     it('should create a new user', (done) => {
       chai.request(app)
-        .post('/api/v1/users/').send(fakeEsther).end((err, res) => {
+        .post('/api/v1/users/')
+        .send(fakeEsther).end((err, res) => {
           expect(res.status).to.equal(201);
           expect(res.body).to.have.keys(['message', 'user']);
           expect(res.body.message).to.eql('signup successful');
@@ -109,21 +148,24 @@ describe('Users', () => {
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(Array.isArray(res.body.allUsers));
-          expect(res.body.allUsers.length).to.be.greaterThan(2);
+          expect(res.body.allUsers[0].name).to.eql('Baas Bank');
+          expect(res.body.allUsers[0].email).to.eql('baas@test.com');
+          expect(res.body.allUsers[1].email).to.eql('john@test.com');
+          expect(res.body.allUsers[1].roleType).to.eql('super user');
           done();
         });
     });
-    // it('should return a message if a regular user accesses it', (done) => {
-    //   chai.request(app)
-    //     .get('/api/v1/users')
-    //     .set({ 'Authorization': regularUserToken })
-    //     .end((err, res) => {
-    //       expect(res.status).to.equal(401);
-    //       expect(res.body).to.have.keys(['message']);
-    //       expect(res.body.message).to.eql('No authorization');
-    //       done();
-    //     });
-    // });
+    it('should return a message if a regular user accesses it', (done) => {
+      chai.request(app)
+        .get('/api/v1/users')
+        .set({ 'Authorization': regularUserToken })
+        .end((err, res) => {
+          expect(res.status).to.equal(403);
+          expect(res.body).to.have.keys(['message']);
+          expect(res.body.message).to.eql('Only an admin can access this resource.');
+          done();
+        });
+    });
     it('should paginate users if user is admin and limit and query is supplied', (done) => {
       chai.request(app)
         .get('/api/v1/users?limit=2&offset=0')
@@ -131,8 +173,14 @@ describe('Users', () => {
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(Array.isArray(res.body.users));
-          expect(res.body.users.length).to.be.greaterThan(1);
-          expect(res.body).to.have.keys(['pagination', 'users']);
+          expect(res.body).to.have.keys(['pagination', 'allUsers']);
+          expect(res.body.pagination).to.have.keys(['totalCount', 'pageSize', 'currentPage', 'pageCount']);
+          expect(res.body.pagination.totalCount).to.equal(4);
+          expect(res.body.pagination.pageSize).to.equal(2);
+          expect(res.body.allUsers[0].fullName).to.eql('Baas Bank');
+          expect(res.body.allUsers[0].roleType).to.eql('admin');
+          expect(res.body.allUsers[1].id).to.equal(2);
+          expect(res.body.allUsers[1].email).to.eql('john@test.com');
           done();
         });
     });

@@ -48,9 +48,6 @@ class DocumentsController {
           accessType: document.accessType,
           ownerId: document.userId
         }
-      }))
-      .catch(() => res.status(500).send({
-        message: 'Error. Please try again.',
       }));
   }
 
@@ -120,18 +117,16 @@ class DocumentsController {
       .findById(req.params.id)
       .then((document) => {
         if (!document) {
-          throw new Error('Document does not exist.');
-        }
-        if (document.accessType === 'private' && req.decoded.userId !== req.params.id) {
-          return res.status(403).send({
-            message: 'You do not have access to this document'
+          return res.status(404).send({
+            message: 'Document does not exist.'
           });
         }
-
-        if (document.accessType === 'role' && (req.decoded.roleType !== 'super user' || req.decoded.roleType !== 'admin')) {
-          return res.status(403).send({
-            message: 'You do not have access to this document'
-          });
+        if ((req.decoded.roleType !== 'admin') && (document.accessType === 'private') &&
+          (document.userId !== req.decoded.userId)) {
+          return res.status(403)
+            .send({
+              message: 'Private document.',
+            });
         }
         return res.status(200).send({
           documentId: document.id,
@@ -161,7 +156,7 @@ class DocumentsController {
       .then((document) => {
         if (!document) {
           return res.status(404).send({
-            message: 'Cannot find document',
+            message: 'Document does not exist.',
           });
         }
         if (req.decoded.userId !== document.userId) {

@@ -25,42 +25,49 @@ class UsersController {
      * @memberOf UsersController
      */
   static createUser(req, res) {
-    if (req.body.fullName &&
-      req.body.email &&
-      req.body.password) {
-      User.findOne({ where: { email: req.body.email } })
-        .then((existingUser) => {
-          if (existingUser) {
-            res.status(400).send({
-              message: 'User already exists!',
-            });
-          }
-          User.create({
-            fullName: req.body.fullName,
-            email: req.body.email,
-            password: req.body.password,
-            roleType: 'regular user'
-          })
-            .then(user => res.status(201).send({
-              message: 'signup successful',
-              user: {
-                id: user.id,
-                name: user.fullName,
-                email: user.email,
-                roleType: user.roleType,
-              }
-            }))
-            .catch(() => res.status(500).send({
-              message: 'Error. Please try again.',
-            }));
-        }).catch((error) => {
-          res.status(400).json(error);
-        });
-    } else {
-      return res.status(206).send({
-        message: 'All fields are required.'
+    if (!req.body.fullName) {
+      return res.status(400).send({
+        message: 'fullName field is required.'
       });
     }
+    if (!req.body.email) {
+      return res.status(400).send({
+        message: 'email field is required.'
+      });
+    }
+    if (!req.body.password) {
+      return res.status(400).send({
+        message: 'password field is required.'
+      });
+    }
+    User.findOne({ where: { email: req.body.email } })
+      .then((existingUser) => {
+        if (existingUser) {
+          res.status(400).send({
+            message: 'User already exists!',
+          });
+        }
+        User.create({
+          fullName: req.body.fullName,
+          email: req.body.email,
+          password: req.body.password,
+          roleType: 'regular user'
+        })
+          .then(user => res.status(201).send({
+            message: 'signup successful',
+            user: {
+              id: user.id,
+              name: user.fullName,
+              email: user.email,
+              roleType: user.roleType,
+            }
+          }))
+          .catch(() => res.status(500).send({
+            message: 'Error. Please try again.',
+          }));
+      }).catch((error) => {
+        res.status(400).json(error);
+      });
   }
 
   /**
@@ -73,32 +80,37 @@ class UsersController {
    * @memberOf UsersController
    */
   static login(req, res) {
-    if (!(req.body.password) || !(req.body.email)) {
-      res.status(400)
-        .json({ message: 'All fields are required' });
-    } else {
-      User.findOne({ where: { email: req.body.email } })
-        .then((user) => {
-          if (user && bcrypt.compareSync(req.body.password, user.password)) {
-            const userData = {
-              userId: user.id,
-              fullName: user.fullName,
-              roleType: user.roleType,
-            };
-
-            const token = jwt.sign(userData, secret, {
-              expiresIn: '48h'
-            });
-            res.status(200).json({
-              token
-            });
-          } else {
-            res.status(401)
-              .send({ message: 'Invalid login credentials. Try again.' });
-          }
-        })
-        .catch(error => res.status(400).send(error));
+    if (!req.body.email) {
+      return res.status(400).send({
+        message: 'email field is required.'
+      });
     }
+    if (!req.body.password) {
+      return res.status(400).send({
+        message: 'password field is required.'
+      });
+    }
+    User.findOne({ where: { email: req.body.email } })
+      .then((user) => {
+        if (user && bcrypt.compareSync(req.body.password, user.password)) {
+          const userData = {
+            userId: user.id,
+            fullName: user.fullName,
+            roleType: user.roleType,
+          };
+
+          const token = jwt.sign(userData, secret, {
+            expiresIn: '48h'
+          });
+          res.status(200).json({
+            token
+          });
+        } else {
+          res.status(401)
+            .send({ message: 'Invalid login credentials. Try again.' });
+        }
+      })
+      .catch(error => res.status(400).send(error));
   }
   /**
    * Get all users
@@ -113,7 +125,7 @@ class UsersController {
     if ((!req.query.limit) && (!req.query.offset)) {
       User.findAll()
         .then((users) => {
-          res.status(200).send(
+          return res.status(200).send(
             {
               allUsers:
               users.map(user => (
@@ -138,8 +150,16 @@ class UsersController {
           const pagination = helper.paginate(
             query.limit, query.offset, users.count
           );
-          res.status(200).send({
-            pagination, users: users.rows,
+          return res.status(200).send({
+            pagination,
+            allUsers: users.rows.map(user => (
+              {
+                id: user.id,
+                fullName: user.fullName,
+                email: user.email,
+                roleType: user.roleType,
+              }
+            ))
           });
         });
     }
