@@ -4,6 +4,7 @@
   "description": "A full stack document management system, complete with roles and privileges.",
   "main": "index.js",
   "scripts": {
+    "start:dev": "nodemon --exec babel-node app.js",
     "start": "gulp production && node ./dist/app.js",
     "dev": "node node_modules/gulp/bin/gulp",
     "test": "NODE_ENV=test node node_modules/.bin/gulp test"

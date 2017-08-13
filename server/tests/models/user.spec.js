@@ -1,9 +1,9 @@
 import chai from 'chai';
 import models from '../../models/';
-import data from '../mockData';
+import mockData from '../MockData';
 
 const expect = chai.expect;
-const { fakeAudax } = data;
+const { fakeAudax } = mockData;
 let dummyId;
 
 describe('User Model', () => {

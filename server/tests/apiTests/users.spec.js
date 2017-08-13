@@ -2,15 +2,22 @@ import chai from 'chai';
 import http from 'chai-http';
 import app from '../../../app';
 import models from '../../models/';
-import data from '../mockData';
+import mockData from '../MockData';
 
 
 const expect = chai.expect;
 chai.use(http);
 
-const { admin, regularUser, incompleteLoginCredentials, fakeEsther, fakeUserDetails, updateUser, userPasswordMismatch } = data;
+const { admin,
+  regularUser,
+  superUser,
+  fakeEsther,
+  updateUser,
+  userPasswordMismatch } = mockData;
 
-let adminToken, regularUserToken;
+let adminToken;
+let regularUserToken;
+let superUserToken;
 
 describe('Users', () => {
   before((done) => {
@@ -31,6 +38,15 @@ describe('Users', () => {
         done();
       });
   });
+  before((done) => {
+    chai.request(app)
+      .post('/api/v1/users/login')
+      .send(superUser)
+      .end((err, res) => {
+        superUserToken = res.body.token;
+        done();
+      });
+  });
   after((done) => {
     models.User.destroy({ where: { id: { $notIn: [1, 2, 3, 4, 5] } } });
     done();
@@ -38,25 +54,40 @@ describe('Users', () => {
   describe('POST: /users/login', () => {
     it('should log in a user and return a token', (done) => {
       chai.request(app)
-        .post('/api/v1/users/login').send(admin).end((err, res) => {
-          expect(res.status).to.equal(201);
-          expect(res.body).to.have.keys(['message', 'token']);
-          expect(res.body.message).to.eql('login successful');
+        .post('/api/v1/users/login')
+        .send(admin).end((err, res) => {
+          expect(res.status).to.equal(200);
+          expect(res.body).to.have.keys(['token']);
           done();
         });
     });
-    it('should return a message for incomplete login details', (done) => {
+    it('should return a message if password field is not supplied', (done) => {
       chai.request(app)
-        .post('/api/v1/users/login').send(incompleteLoginCredentials).end((err, res) => {
+        .post('/api/v1/users/login')
+        .send({ email: 'testing@test.com' })
+        .end((err, res) => {
           expect(res.status).to.equal(400);
           expect(res.body).to.have.keys(['message']);
-          expect(res.body.message).to.eql('All fields are required');
+          expect(res.body.message).to.eql('password field is required.');
+          done();
+        });
+    });
+    it('should return a message if email field is not supplied', (done) => {
+      chai.request(app)
+        .post('/api/v1/users/login')
+        .send({ password: 'testing123' })
+        .end((err, res) => {
+          expect(res.status).to.equal(400);
+          expect(res.body).to.have.keys(['message']);
+          expect(res.body.message).to.eql('email field is required.');
           done();
         });
     });
     it('should return a message for password mismatch', (done) => {
       chai.request(app)
-        .post('/api/v1/users/login').send(userPasswordMismatch).end((err, res) => {
+        .post('/api/v1/users/login')
+        .send(userPasswordMismatch)
+        .end((err, res) => {
           expect(res.status).to.equal(401);
           expect(res.body).to.have.keys(['message']);
           expect(res.body.message).to.eql('Invalid login credentials. Try again.');
@@ -65,18 +96,43 @@ describe('Users', () => {
     });
   });
   describe('POST: /users/', () => {
-    it('should return a message for incomplete user details', (done) => {
+    it('should return a message if fullName field is not supplied', (done) => {
       chai.request(app)
-        .post('/api/v1/users/').send(fakeUserDetails).end((err, res) => {
-          expect(res.status).to.equal(206);
+        .post('/api/v1/users/')
+        .send({ email: 'femi@test.com', password: 'femi' })
+        .end((err, res) => {
+          expect(res.status).to.equal(400);
           expect(res.body).to.have.keys(['message']);
-          expect(res.body.message).to.eql('All fields are required.');
+          expect(res.body.message).to.eql('fullName field is required.');
+          done();
+        });
+    });
+    it('should return a message if email field is not supplied', (done) => {
+      chai.request(app)
+        .post('/api/v1/users/')
+        .send({ fullName: 'Oluwafemi Medale', password: 'femi' })
+        .end((err, res) => {
+          expect(res.status).to.equal(400);
+          expect(res.body).to.have.keys(['message']);
+          expect(res.body.message).to.eql('email field is required.');
+          done();
+        });
+    });
+    it('should return a message if password field is not supplied', (done) => {
+      chai.request(app)
+        .post('/api/v1/users/')
+        .send({ fullName: 'Oluwafemi Medale', email: 'femi@test.com' })
+        .end((err, res) => {
+          expect(res.status).to.equal(400);
+          expect(res.body).to.have.keys(['message']);
+          expect(res.body.message).to.eql('password field is required.');
           done();
         });
     });
     it('should create a new user', (done) => {
       chai.request(app)
-        .post('/api/v1/users/').send(fakeEsther).end((err, res) => {
+        .post('/api/v1/users/')
+        .send(fakeEsther).end((err, res) => {
           expect(res.status).to.equal(201);
           expect(res.body).to.have.keys(['message', 'user']);
           expect(res.body.message).to.eql('signup successful');
@@ -92,7 +148,10 @@ describe('Users', () => {
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(Array.isArray(res.body.allUsers));
-          expect(res.body.allUsers.length).to.be.greaterThan(2);
+          expect(res.body.allUsers[0].name).to.eql('Baas Bank');
+          expect(res.body.allUsers[0].email).to.eql('baas@test.com');
+          expect(res.body.allUsers[1].email).to.eql('john@test.com');
+          expect(res.body.allUsers[1].roleType).to.eql('super user');
           done();
         });
     });
@@ -101,9 +160,9 @@ describe('Users', () => {
         .get('/api/v1/users')
         .set({ 'Authorization': regularUserToken })
         .end((err, res) => {
-          expect(res.status).to.equal(401);
+          expect(res.status).to.equal(403);
           expect(res.body).to.have.keys(['message']);
-          expect(res.body.message).to.eql('No authorization');
+          expect(res.body.message).to.eql('Only an admin can access this resource.');
           done();
         });
     });
@@ -114,8 +173,14 @@ describe('Users', () => {
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(Array.isArray(res.body.users));
-          expect(res.body.users.length).to.be.greaterThan(1);
-          expect(res.body).to.have.keys(['pagination', 'users']);
+          expect(res.body).to.have.keys(['pagination', 'allUsers']);
+          expect(res.body.pagination).to.have.keys(['totalCount', 'pageSize', 'currentPage', 'pageCount']);
+          expect(res.body.pagination.totalCount).to.equal(4);
+          expect(res.body.pagination.pageSize).to.equal(2);
+          expect(res.body.allUsers[0].fullName).to.eql('Baas Bank');
+          expect(res.body.allUsers[0].roleType).to.eql('admin');
+          expect(res.body.allUsers[1].id).to.equal(2);
+          expect(res.body.allUsers[1].email).to.eql('john@test.com');
           done();
         });
     });
@@ -155,7 +220,7 @@ describe('Users', () => {
           expect(res.status).to.equal(200);
           expect(res.body).to.have.keys(['message', 'user']);
           expect(res.body.message).to.eql('Update Successful!');
-          expect(res.body.user.id).to.equal(1);
+          expect(res.body.user.userId).to.equal(1);
           expect(res.body.user.fullName).to.eql('Baas my man Bank');
           expect(res.body.user.email).to.eql('baasbank@test.com');
           done();
@@ -169,7 +234,32 @@ describe('Users', () => {
         .end((err, res) => {
           expect(res.status).to.equal(403);
           expect(res.body).to.have.keys(['message']);
-          expect(res.body.message).to.eql('You do not have permission to update.');
+          expect(res.body.message).to.eql('You can update only your profile.');
+          done();
+        });
+    });
+    it('should not allow a user update her id', (done) => {
+      chai.request(app)
+        .put('/api/v1/users/4')
+        .send({ id: 5 })
+        .set({ 'Authorization': regularUserToken })
+        .end((err, res) => {
+          expect(res.status).to.equal(403);
+          expect(res.body).to.have.keys(['message']);
+          expect(res.body.message).to.eql('User ID cannot be updated.');
+          done();
+        });
+    });
+    it('should allow an admin update a user role type', (done) => {
+      chai.request(app)
+        .put('/api/v1/users/3')
+        .send({ roleType: 'super user' })
+        .set({ 'Authorization': adminToken })
+        .end((err, res) => {
+          expect(res.status).to.equal(200);
+          expect(res.body).to.have.keys(['message', 'user']);
+          expect(res.body.message).to.eql('Update Successful!');
+          expect(res.body.user.roleType).to.eql('super user');
           done();
         });
     });
@@ -210,7 +300,7 @@ describe('Users', () => {
   describe('GET: /search/users/?q={}', () => {
     it('should allow the admin search for a user by name', (done) => {
       chai.request(app)
-        .get('/api/v1/search/users?search=john')
+        .get('/api/v1/search/users?q=john')
         .set({ 'Authorization': adminToken })
         .end((err, res) => {
           expect(res.status).to.equal(200);
@@ -223,7 +313,7 @@ describe('Users', () => {
     });
     it('should return a message if no user is found', (done) => {
       chai.request(app)
-        .get('/api/v1/search/users?search=temilaj')
+        .get('/api/v1/search/users?q=temilaj')
         .set({ 'Authorization': adminToken })
         .end((err, res) => {
           expect(res.status).to.equal(404);
@@ -237,7 +327,7 @@ describe('Users', () => {
     it('should return all documents belonging to a user given the user id', (done) => {
       chai.request(app)
         .get('/api/v1/users/1/documents')
-        .set({ Authorization: regularUserToken })
+        .set({ Authorization: adminToken })
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body).to.have.keys(['pagination', 'documents']);
@@ -253,7 +343,18 @@ describe('Users', () => {
         .set({ 'Authorization': adminToken })
         .end((err, res) => {
           expect(res.status).to.equal(404);
-          expect(res.body.message).to.eql('No document matches the request.');
+          expect(res.body.message).to.eql('This user does not have any document.');
+          done();
+        });
+    });
+    it('should not allow a user view all of another user documents', (done) => {
+      chai.request(app)
+        .get('/api/v1/users/1/documents')
+        .set({ Authorization: superUserToken })
+        .end((err, res) => {
+          expect(res.status).to.equal(403);
+          expect(res.body).to.have.keys(['message']);
+          expect(res.body.message).to.eql('You cannot view another user documents.');
           done();
         });
     });

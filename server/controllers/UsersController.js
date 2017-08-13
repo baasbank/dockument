@@ -1,66 +1,73 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import db from '../models';
+import models from '../models';
 import helper from '../helper/Helper';
 
 require('dotenv').config();
 
 const secret = process.env.SECRET;
-const Role = db.Role;
-const User = db.User;
-const Document = db.Document;
+const Role = models.Role;
+const User = models.User;
+const Document = models.Document;
 
 /**
- * usersController class to create and manage users
+ * UsersController class to create and manage users
  *
- * @class usersController
+ * @class UsersController
  */
-class usersController {
-/**
-   * Create a user
-   * @static
-   * @param {Object} req - Request object
-   * @param {Object} res - Response object
-   * @returns {object} json - payload
-   * @memberOf usersController
-   */
+class UsersController {
+  /**
+     * Create a user
+     * @static
+     * @param {Object} req - Request object
+     * @param {Object} res - Response object
+     * @returns {object} json - payload
+     * @memberOf UsersController
+     */
   static createUser(req, res) {
-    if (req.body.fullName &&
-        req.body.email &&
-        req.body.password) {
-      User.findOne({ where: { email: req.body.email } })
-        .then((existingUser) => {
-          if (existingUser) {
-            res.status(400).send({
-              message: 'User already exists!',
-            });
-          }
-          User.create({
-            fullName: req.body.fullName,
-            email: req.body.email,
-            password: req.body.password,
-            roleType: 'regular user'
-          })
-            .then(user => res.status(201).send({
-              message: 'signup successful',
-              user: {
-                id: user.id,
-                name: user.fullName,
-                email: user.email,
-                roleType: user.roleType,
-              }
-            }))
-            .catch(() => res.status(500).send({
-              message: 'Error. Please try again.',
-            }));
-        }).catch((error) => {
-          res.status(400).json(error);
-        });
-    } else {
-      return res.status(206).send({
-        message: 'All fields are required.'
+    if (!req.body.fullName) {
+      return res.status(400).send({
+        message: 'fullName field is required.'
       });
     }
+    if (!req.body.email) {
+      return res.status(400).send({
+        message: 'email field is required.'
+      });
+    }
+    if (!req.body.password) {
+      return res.status(400).send({
+        message: 'password field is required.'
+      });
+    }
+    User.findOne({ where: { email: req.body.email } })
+      .then((existingUser) => {
+        if (existingUser) {
+          res.status(400).send({
+            message: 'User already exists!',
+          });
+        }
+        User.create({
+          fullName: req.body.fullName,
+          email: req.body.email,
+          password: req.body.password,
+          roleType: 'regular user'
+        })
+          .then(user => res.status(201).send({
+            message: 'signup successful',
+            user: {
+              id: user.id,
+              name: user.fullName,
+              email: user.email,
+              roleType: user.roleType,
+            }
+          }))
+          .catch(() => res.status(500).send({
+            message: 'Error. Please try again.',
+          }));
+      }).catch((error) => {
+        res.status(400).json(error);
+      });
   }
 
   /**
@@ -70,36 +77,40 @@ class usersController {
    * @param {Object} req - Request object
    * @param {Object} res - Response object
    * @returns {object} json - payload 
-   * @memberOf usersController
+   * @memberOf UsersController
    */
   static login(req, res) {
-    if (!(req.body.password) || !(req.body.email)) {
-      res.status(400)
-        .json({ message: 'All fields are required' });
-    } else {
-      User.findOne({ where: { email: req.body.email } })
-        .then((user) => {
-          if (user && bcrypt.compareSync(req.body.password, user.password)) {
-            const userData = {
-              userId: user.id,
-              fullName: user.fullName,
-              roleType: user.roleType,
-            };
-
-            const token = jwt.sign(userData, secret, {
-              expiresIn: '48h'
-            });
-            res.status(201).json({
-              message: 'login successful',
-              token
-            });
-          } else {
-            res.status(401)
-              .send({ message: 'Invalid login credentials. Try again.' });
-          }
-        })
-        .catch(error => res.status(400).send(error));
+    if (!req.body.email) {
+      return res.status(400).send({
+        message: 'email field is required.'
+      });
     }
+    if (!req.body.password) {
+      return res.status(400).send({
+        message: 'password field is required.'
+      });
+    }
+    User.findOne({ where: { email: req.body.email } })
+      .then((user) => {
+        if (user && bcrypt.compareSync(req.body.password, user.password)) {
+          const userData = {
+            userId: user.id,
+            fullName: user.fullName,
+            roleType: user.roleType,
+          };
+
+          const token = jwt.sign(userData, secret, {
+            expiresIn: '48h'
+          });
+          res.status(200).json({
+            token
+          });
+        } else {
+          res.status(401)
+            .send({ message: 'Invalid login credentials. Try again.' });
+        }
+      })
+      .catch(error => res.status(400).send(error));
   }
   /**
    * Get all users
@@ -108,13 +119,13 @@ class usersController {
    * @param {Object} req - Request object
    * @param {Object} res - Response object
    *@returns {object} json - payload
-   * @memberOf usersController
+   * @memberOf UsersController
    */
   static getAllUsers(req, res) {
     if ((!req.query.limit) && (!req.query.offset)) {
       User.findAll()
         .then((users) => {
-          res.status(200).send(
+          return res.status(200).send(
             {
               allUsers:
               users.map(user => (
@@ -136,11 +147,19 @@ class usersController {
       User
         .findAndCountAll(query)
         .then((users) => {
-          const pagination = helper.pagination(
+          const pagination = helper.paginate(
             query.limit, query.offset, users.count
           );
-          res.status(200).send({
-            pagination, users: users.rows,
+          return res.status(200).send({
+            pagination,
+            allUsers: users.rows.map(user => (
+              {
+                id: user.id,
+                fullName: user.fullName,
+                email: user.email,
+                roleType: user.roleType,
+              }
+            ))
           });
         });
     }
@@ -152,7 +171,7 @@ class usersController {
    * @param {Object} req - Request object
    * @param {Object} res - Response object
    *@returns {object} user - the user's details
-   * @memberOf usersController
+   * @memberOf UsersController
    */
   static findAUser(req, res) {
     return User
@@ -180,7 +199,7 @@ class usersController {
    * @param {Object} req - Request object
    * @param {Object} res - Response object
    * @returns {object} json - payload
-   * @memberOf usersController
+   * @memberOf UsersController
    */
   static updateUser(req, res) {
     Role.findOne({ where: { roleType: req.decoded.roleType } })
@@ -200,29 +219,48 @@ class usersController {
               });
             }
 
+            if (req.body.createdAt) {
+              return res.status(403).send({
+                message:
+                'createdAt date cannot be changed.',
+              });
+            }
+
+            if (req.body.updatedAt) {
+              return res.status(403).send({
+                message:
+                'updatedAt date cannot be changed.',
+              });
+            }
+
             if ((role.roleType !== 'admin') && (req.body.roleType)) {
               return res.status(403).send({
                 message:
-                'You do not have permission to update this property.',
+                'You cannot update your role type.',
               });
             }
 
             if ((role.roleType !== 'admin') && (req.decoded.userId !== user.id)) {
               return res.status(403).send({
                 message:
-                'You do not have permission to update.',
+                'You can update only your profile.',
               });
             }
             user
               .update({
-                fullName: req.body.name || user.fullName,
+                fullName: req.body.fullName || user.fullName,
                 email: req.body.email || user.email,
                 password: req.body.password || user.password,
                 roleType: req.body.roleType || user.roleType,
               })
-              .then(() => res.status(200).send({
+              .then(updatedUser => res.status(200).send({
                 message: 'Update Successful!',
-                user,
+                user: {
+                  fullName: updatedUser.fullName,
+                  email: updatedUser.email,
+                  roleType: updatedUser.roleType,
+                  userId: updatedUser.id
+                }
               }));
           })
           .catch(() => res.status(500).send(
@@ -237,7 +275,7 @@ class usersController {
     * @param {Object} req request object
     * @param {Object} res response object
     * @returns {object} message - delete message
-    * @memberOf usersController
+    * @memberOf UsersController
     */
   static deleteAUser(req, res) {
     User
@@ -266,10 +304,10 @@ class usersController {
    * @param {Object} req - Request object
    * @param {Object} res - Response object
    * @returns {object} json- payload
-   * @memberOf usersController
+   * @memberOf UsersController
    */
   static searchUsers(req, res) {
-    const searchTerm = req.query.search.trim();
+    const searchTerm = req.query.q.trim();
 
     const query = {
       where: {
@@ -290,7 +328,7 @@ class usersController {
     User
       .findAndCountAll(query)
       .then((users) => {
-        const pagination = helper.pagination(
+        const pagination = helper.paginate(
           query.limit, query.offset, users.count
         );
         if (!users.rows.length) {
@@ -311,46 +349,52 @@ class usersController {
    * @param {Object} req - Request object
    * @param {Object} res - Response object
    * @returns {object} json - payload
-   * @memberOf usersController
+   * @memberOf UsersController
    */
   static getUserDocuments(req, res) {
-    const query = {
-      where: {
-        UserId: { $eq: req.params.id },
-      }
-    };
-    query.limit = (req.query.limit > 0) ? req.query.limit : 5;
-    query.offset = (req.query.offset > 0) ? req.query.offset : 0;
-    Document
-      .findAndCountAll(query)
-      .then((documents) => {
-        const mappedDocuments = documents.rows
-          .map(document => ({
-            id: document.id,
-            title: document.title,
-            content: document.content,
-            access: document.accessType,
-            OwnerId: document.UserId,
-            createdAt: document.createdAt,
-            updatedAt: document.updatedAt,
-          }));
-
-        const pagination = helper.pagination(
-          query.limit, query.offset, documents.count
-        );
-        if (!documents.rows.length) {
-          return res.status(404).send({
-            message: 'No document matches the request.',
-          });
+    if ((parseInt(req.params.id, 10) === req.decoded.userId) || (req.decoded.roleType === 'admin')) {
+      const query = {
+        where: {
+          userId: { $eq: req.params.id },
         }
-        res.status(200).send({
-          pagination, documents: mappedDocuments,
-        });
-      })
-      .catch(() => res.status(400).send(
-        'Error. Please check the id and try again'
-      ));
+      };
+      query.limit = (req.query.limit > 0) ? req.query.limit : 5;
+      query.offset = (req.query.offset > 0) ? req.query.offset : 0;
+      Document
+        .findAndCountAll(query)
+        .then((documents) => {
+          const mappedDocuments = documents.rows
+            .map(document => ({
+              id: document.id,
+              title: document.title,
+              content: document.content,
+              access: document.accessType,
+              OwnerId: document.userId,
+              createdAt: document.createdAt,
+              updatedAt: document.updatedAt,
+            }));
+
+          const pagination = helper.paginate(
+            query.limit, query.offset, documents.count
+          );
+          if (!documents.rows.length) {
+            return res.status(404).send({
+              message: 'This user does not have any document.',
+            });
+          }
+          res.status(200).send({
+            pagination, documents: mappedDocuments,
+          });
+        })
+        .catch(() => res.status(400).send(
+          'Error. Please check the id and try again'
+        ));
+    } else {
+      return res.status(403).send({
+        message: 'You cannot view another user documents.',
+      });
+    }
   }
 }
 
-export default usersController;
+export default UsersController;

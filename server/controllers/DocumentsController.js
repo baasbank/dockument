@@ -1,50 +1,54 @@
-import db from '../models';
-import helper from '../helper/Helper';
+import models from '../models';
+import Helper from '../helper/Helper';
 
-const Document = db.Document;
+const Document = models.Document;
 
 /**
  * class to create and manage documents
- * @class documentsController
+ * @class DocumentsController
  */
-class documentsController {
+class DocumentsController {
   /**
    * create a new document
    * @static
    * @param {Object} req - Request object
    * @param {Object} res - Response object
    * @returns {object} json - payload
-   * @memberOf documentsController
+   * @memberOf DocumentsController
    */
   static createDocument(req, res) {
-    if (req.body.title &&
-        req.body.content &&
-        req.body.accessType &&
-        req.body.userId) {
-      Document
-        .create({
-          title: req.body.title,
-          content: req.body.content,
-          accessType: req.body.accessType,
-          UserId: req.body.userId,
-        })
-        .then(document => res.status(201).send({
-          message: 'Document created.',
-          details: {
-            documentId: document.id,
-            content: document.content,
-            accessType: document.accessType,
-            ownerId: document.UserId
-          }
-        }))
-        .catch(() => res.status(500).send({
-          message: 'Error. Please try again.',
-        }));
-    } else {
-      return res.status(206).send({
-        message: 'All fields are required.'
+    if (!req.body.title) {
+      return res.status(400).send({
+        message: 'Title field is required.'
       });
     }
+    if (!req.body.content) {
+      return res.status(400).send({
+        message: 'Content field is required.'
+      });
+    }
+    if (!req.body.accessType) {
+      return res.status(400).send({
+        message: 'accessType field is required.'
+      });
+    }
+    Document
+      .create({
+        title: req.body.title,
+        content: req.body.content,
+        accessType: req.body.accessType,
+        userId: req.decoded.userId,
+      })
+      .then(document => res.status(201).send({
+        message: 'Document created.',
+        document: {
+          documentId: document.id,
+          title: document.title,
+          content: document.content,
+          accessType: document.accessType,
+          ownerId: document.userId
+        }
+      }));
   }
 
   /**
@@ -54,12 +58,17 @@ class documentsController {
    * @param {Object} req - Request object
    * @param {Object} res - Response object
    *@returns {object} json - payload
-   * @memberOf documentsController
+   * @memberOf DocumentsController
    */
   static getAllDocuments(req, res) {
     if ((!req.query.limit) && (!req.query.offset)) {
       Document.findAll()
         .then((documents) => {
+          if (!documents) {
+            return res.status(404).send({
+              message: 'No documents found.'
+            });
+          }
           res.status(200).send(
             {
               allDocuments:
@@ -69,7 +78,7 @@ class documentsController {
                     title: document.title,
                     content: document.content,
                     access: document.accessType,
-                    userId: document.UserId,
+                    userId: document.userId,
                   }
                 );
               })
@@ -85,7 +94,7 @@ class documentsController {
       Document
         .findAndCountAll(query)
         .then((documents) => {
-          const pagination = helper.pagination(
+          const pagination = Helper.paginate(
             query.limit, query.offset, documents.count
           );
           res.status(200).send({
@@ -101,32 +110,30 @@ class documentsController {
    * @param {Object} req - Request object
    * @param {Object} res - Response object
    *@returns {object} json - payload
-   * @memberOf documentsController
+   * @memberOf DocumentsController
    */
   static findADocument(req, res) {
     return Document
       .findById(req.params.id)
       .then((document) => {
         if (!document) {
-          throw new Error('Document does not exist.');
-        }
-        if (document.accessType === 'private' && req.decoded.userId !== req.params.id) {
-          return res.status(403).send({
-            message: 'You do not have access to this document'
+          return res.status(404).send({
+            message: 'Document does not exist.'
           });
         }
-
-        if (document.accessType === 'role' && (req.decoded.roleType !== 'super user' || req.decoded.roleType !== 'admin')) {
-          return res.status(403).send({
-            message: 'You do not have access to this document'
-          });
+        if ((req.decoded.roleType !== 'admin') && (document.accessType === 'private') &&
+          (document.userId !== req.decoded.userId)) {
+          return res.status(403)
+            .send({
+              message: 'Private document.',
+            });
         }
         return res.status(200).send({
           documentId: document.id,
           title: document.title,
           content: document.content,
           access: document.accessType,
-          ownerId: document.UserId,
+          ownerId: document.userId,
         });
       })
       .catch((error) => {
@@ -141,7 +148,7 @@ class documentsController {
    * @param {Object} req - Request object
    * @param {Object} res - Response object
    * @returns {object} json - payload
-   * @memberOf documentsController
+   * @memberOf DocumentsController
    */
   static updateDocument(req, res) {
     Document
@@ -149,10 +156,10 @@ class documentsController {
       .then((document) => {
         if (!document) {
           return res.status(404).send({
-            message: 'Cannot find document',
+            message: 'Document does not exist.',
           });
         }
-        if (req.decoded.userId !== document.UserId) {
+        if (req.decoded.userId !== document.userId) {
           return res.status(403).send({
             message: 'You can update only your documents.'
           });
@@ -164,11 +171,16 @@ class documentsController {
             'Document ID cannot be changed.',
           });
         }
-
-        if (req.body.UserId) {
+        if (req.body.createdAt) {
           return res.status(403).send({
             message:
-            'User ID cannot be changed.',
+            'createdAt date cannot be changed.',
+          });
+        }
+        if (req.body.updatedAt) {
+          return res.status(403).send({
+            message:
+            'updatedAt date cannot be changed.',
           });
         }
         document
@@ -176,7 +188,7 @@ class documentsController {
             title: req.body.title || document.title,
             content: req.body.content || document.content,
             access: req.body.accessType || document.accessType,
-            userId: document.UserId,
+            userId: document.userId,
           })
           .then(() => res.status(200).send({
             message: 'Update Successful!',
@@ -197,7 +209,7 @@ class documentsController {
     * @param {Object} req request object
     * @param {Object} res response object
     * @returns {object} json - payload
-    * @memberOf documentsController
+    * @memberOf DocumentsController
     */
   static deleteADocument(req, res) {
     Document
@@ -209,7 +221,7 @@ class documentsController {
           });
         }
 
-        if (req.decoded.userId !== document.UserId) {
+        if (req.decoded.userId !== document.userId) {
           return res.status(403).send({
             message: 'You can delete only your documents.'
           });
@@ -231,10 +243,10 @@ class documentsController {
    * @param {Object} req - Request object
    * @param {Object} res - Response object
    * @returns {object} json - payload
-   * @memberOf documentsController
+   * @memberOf DocumentsController
    */
   static searchDocuments(req, res) {
-    const searchTerm = req.query.search.trim();
+    const searchTerm = req.query.q.trim();
 
     const query = {
       where: {
@@ -251,7 +263,7 @@ class documentsController {
     Document
       .findAndCountAll(query)
       .then((documents) => {
-        const pagination = helper.pagination(
+        const pagination = Helper.paginate(
           query.limit, query.offset, documents.count
         );
         if (!documents.rows.length) {
@@ -266,4 +278,4 @@ class documentsController {
   }
 }
 
-export default documentsController;
+export default DocumentsController;

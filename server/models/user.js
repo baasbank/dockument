@@ -37,7 +37,7 @@ module.exports = (sequelize, DataTypes) => {
     classMethods: {
       associate: (models) => {
         User.hasMany(models.Document, {
-          foreignKey: 'UserId',
+          foreignKey: 'userId',
           as: 'documents',
         });
 
@@ -48,10 +48,24 @@ module.exports = (sequelize, DataTypes) => {
       }
     }
   });
+
+  /**
+   * beforeCreate hook
+   * @description convert email to lowercase and hash password
+   * @param {Object} user - user object
+   *@returns {void}
+   */
   User.beforeCreate((user) => {
     user.email = user.email.toLowerCase();
     user.password = bcrypt.hashSync(user.password, bcrypt.genSaltSync(10));
   });
+
+  /**
+   * beforeUpdate hook
+   * @description change password
+   * @param {Object} user - user object
+   *@returns {void}
+   */
   User.beforeUpdate((user) => {
     if (user._changed.password) {
       user.password = bcrypt.hashSync(user.password, bcrypt.genSaltSync(10));

@@ -2,13 +2,13 @@ import chai from 'chai';
 import http from 'chai-http';
 import app from '../../../app';
 import models from '../../models/';
-import data from '../mockData';
+import mockData from '../MockData';
 
 
 const expect = chai.expect;
 chai.use(http);
 
-const { admin } = data;
+const { admin } = mockData;
 let adminToken;
 
 

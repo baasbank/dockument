@@ -25,7 +25,7 @@ export default {
     password: 'wrong'
   },
   updateUser: {
-    name: 'Baas my man Bank',
+    fullName: 'Baas my man Bank',
     email: 'baasbank@test.com'
   },
   fakeEsther: {
@@ -61,6 +61,5 @@ export default {
   fakeDocument: {
     title: faker.lorem.word(),
     content: faker.lorem.paragraph(),
-    accessType: 'public'
   }
 };
