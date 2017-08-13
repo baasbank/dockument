@@ -1,2 +1,9 @@
 node_modules
-DS_Store
+.DS_Store
+.vscode
+.env
+npm-debug.log
+coverage
+.nyc_output
+public/.DS_Store
+dist
