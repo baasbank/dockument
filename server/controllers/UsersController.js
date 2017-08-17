@@ -43,7 +43,7 @@ class UsersController {
     User.findOne({ where: { email: req.body.email } })
       .then((existingUser) => {
         if (existingUser) {
-          res.status(400).send({
+          return res.status(400).send({
             message: 'User already exists!',
           });
         }
@@ -65,8 +65,10 @@ class UsersController {
           .catch(() => res.status(500).send({
             message: 'Error. Please try again.',
           }));
-      }).catch((error) => {
-        res.status(400).json(error);
+      }).catch(() => {
+        res.status(500).send({
+          message: 'Error. Please try again.'
+        });
       });
   }
 
@@ -92,6 +94,11 @@ class UsersController {
     }
     User.findOne({ where: { email: req.body.email } })
       .then((user) => {
+        if (!user) {
+          return res.status(404).send({
+            message: 'Cannot find user.'
+          });
+        }
         if (user && bcrypt.compareSync(req.body.password, user.password)) {
           const userData = {
             userId: user.id,
@@ -110,7 +117,7 @@ class UsersController {
             .send({ message: 'Password mismatch.' });
         }
       })
-      .catch(error => res.status(400).send(error));
+      .catch(() => res.status(500).send({ message: 'Error. Please try again.' }));
   }
   /**
    * Get all users
@@ -125,6 +132,11 @@ class UsersController {
     if ((!req.query.limit) && (!req.query.offset)) {
       User.findAll()
         .then((users) => {
+          if (!users) {
+            return res.status(200).send({
+              message: 'No user.'
+            });
+          }
           return res.status(200).send(
             {
               allUsers:
@@ -138,8 +150,8 @@ class UsersController {
               ))
             });
         })
-        .catch(() => res.status(400).send({
-          message: 'An error occured.',
+        .catch(() => res.status(500).send({
+          message: 'Error. Please try again.',
         }));
     } else {
       const query = {};
