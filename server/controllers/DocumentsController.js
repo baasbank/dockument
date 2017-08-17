@@ -85,7 +85,7 @@ class DocumentsController {
             });
         })
         .catch(() => res.status(500).send({
-          message: 'An error occured.',
+          message: 'Error. Please try again.',
         }));
     } else {
       const query = {};
