@@ -136,9 +136,8 @@ class DocumentsController {
           ownerId: document.userId,
         });
       })
-      .catch((error) => {
-        const errorMessage = error.message || error;
-        res.status(400).send(errorMessage);
+      .catch(() => {
+        res.status(500).send({ message: 'Error. Please try again.' });
       });
   }
 
@@ -190,9 +189,15 @@ class DocumentsController {
             access: req.body.accessType || document.accessType,
             userId: document.userId,
           })
-          .then(() => res.status(200).send({
+          .then(updatedDocument => res.status(200).send({
             message: 'Update Successful!',
-            document,
+            document: {
+              id: updatedDocument.id,
+              title: updatedDocument.title,
+              content: updatedDocument.content,
+              accessType: updatedDocument.accessType,
+              userId: updatedDocument.userId
+            }
           }))
           .catch(() => res.status(500).send({
             message: 'Error. Please try again.',
@@ -228,7 +233,7 @@ class DocumentsController {
         }
         document
           .destroy()
-          .then(() => res.status(410).send({
+          .then(() => res.status(200).send({
             message: 'Document deleted successfully.',
           }));
       })
@@ -250,11 +255,9 @@ class DocumentsController {
 
     const query = {
       where: {
-        $or: [{
-          title: {
-            $iLike: `%${searchTerm}%`,
-          },
-        }],
+        title: {
+          $iLike: `%${searchTerm}%`,
+        },
       },
     };
 
@@ -272,7 +275,16 @@ class DocumentsController {
           });
         }
         res.status(200).send({
-          pagination, documents: documents.rows,
+          pagination,
+          documents: documents.rows.map(document => (
+            {
+              id: document.id,
+              title: document.title,
+              content: document.content,
+              accessType: document.accessType,
+              userId: document.userId
+            }
+          ))
         });
       });
   }
