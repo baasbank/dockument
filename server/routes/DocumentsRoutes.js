@@ -63,9 +63,9 @@ const DocumentsRoute = (router) => {
  *     get:
  *       tags:
  *         - Documents
- *       summary: Returns all documents
- *       description: ''
- *       operationId: fetchAllDocuments
+ *       summary: Get all documents
+ *       description: Get all documents.
+ *       operationId: getAllDocuments
  *       produces:
  *         - application/json
  *       parameters:
@@ -83,24 +83,74 @@ const DocumentsRoute = (router) => {
  *           required: false
  *       responses:
  *         200:
- *           description: Document created
+ *           description: OK
+ *           examples:
+ *             application/json:
+ *               {
+ *                 allDocuments: [
+ *                   {
+ *                     title: "My first document",
+ *                     content: "lorem ipsum and the rest of it",
+ *                     access: "public",
+ *                     userId: 1
+ *                   },
+ *                   {
+ *                     title: "My second document",
+ *                     content: "second lorem ipsum and the rest of it",
+ *                     access: "private",
+ *                     userId: 2
+ *                   }, 
+ *                   {
+ *                     title: "My third document",
+ *                     content: "third lorem ipsum and the rest of it",
+ *                     access: "role",
+ *                     userId: 3
+ *                   },
+ *                   {
+ *                     title: "My fourth document",
+ *                     content: "fourth lorem ipsum and the rest of it",
+ *                     access: "public",
+ *                     userId: 2
+ *                   }
+ *      ]
+ *    }
  *           schema:
- *             "$ref": "#/definitions/Document"
+ *             $ref: "#/definitions/Document"
  *         400:
- *           description: An error occurred.
+ *           description: Bad Request
+ *           examples:
+ *             application/json:
+ *               {
+ *                 message: "No documents found."
+ *               }
+ *           schema:
+ *             $ref: "#/definitions/Document"
+ *         500:
+ *           description: Internal Server Error
+ *           examples:
+ *             application/json:
+ *               {
+ *                 message: "An error occurred."
+ *               }
+ *           schema:
+ *             $ref: "#/definitions/Document"
  *       security:
  *       - Authorization: []
  *     post:
  *       tags:
  *         - Documents
  *       summary: Create a new document
- *       description: ''
+ *       description: Allows a user create a new document.
  *       operationId: createNewDocument
  *       produces:
  *         - application/json
  *       consumes:
  *         - application/x-www-form-urlencoded
  *       parameters:
+ *       - in: header
+ *         name: Authorization
+ *         description: token from login
+ *         required: true 
  *       - in: formData
  *         name: title
  *         description: document title
@@ -113,24 +163,37 @@ const DocumentsRoute = (router) => {
  *         name: accessType
  *         description: Who can access the document
  *         required: true
- *       - in: formData
- *         name: userId
- *         description: id of the owner 
- *         required: true
  *       responses:
  *         201:
- *           description: Document created
+ *           description: OK
+ *           examples:
+ *             application/json:
+ *               {
+ *                 message: 'Document created.',
+ *                  document: {
+ *                    documentId: 4,
+ *                    title: Lovey Dovey,
+ *                    content: I will conquer my opponent. Defeat will not be in my creed,
+ *                    accessType: public,
+ *                    userId: 5
+ *                   } 
+ *               }
  *           schema:
- *             "$ref": '#/definitions/Document'
+ *             $ref: '#/definitions/Document'
  *         400:
- *           description: Error. Please try again.
- *         206:
- *           description: All fields are required.
+ *           description: Bad Request
+ *           examples:
+ *             application/json:
+ *               {
+ *                 message: "Title field is required."
+ *               }
+ *           schema:
+ *             $ref: "#/definitions/Document"
  *       security:
  *       - Authorization: []
  */ 
     .post(Authenticate.verifyToken, DocumentsController.createDocument)
-    .get(Authenticate.verifyToken, Authenticate.hasAdminAccess, 
+    .get(Authenticate.verifyToken, Authenticate.hasAdminAccess,
       DocumentsController.getAllDocuments);
 
   // get, update, and delete a document by its ID
@@ -138,48 +201,86 @@ const DocumentsRoute = (router) => {
 /**
  * @swagger
  * paths:
- *   /api/v1/documents/:id:
+ *   /api/v1/documents/{id}:
  *     get:
  *       tags:
  *         - Documents
- *       summary: Get document by id
- *       description: ''
- *       operationId: fetchDocument
+ *       summary: Get a document by its id
+ *       description: Get a document by id
+ *       operationId: getDocument
  *       produces:
  *         - application/json
  *       parameters:
+ *         - in: header
+ *           name: Authorization
+ *           description: token from login
+ *           required: true 
  *         - name: id
- *           in: query
+ *           in: path
  *           description: The id of the document the user wants.
  *           required: true
  *           type: integer
  *       responses:
  *         200:
- *           description: ''
+ *           description: OK
+ *           examples:
+ *             application/json:
+ *               {
+ *                 documentId: document.id,
+ *                 title: document.title,
+ *                 content: document.content,
+ *                 access: document.accessType,
+ *                 userId: document.userId 
+ *               }
  *           schema:
- *             "$ref": "#/definitions/Document"
- *         400:
- *           description: Database error
+ *             $ref: "#/definitions/Document"
  *         403:
- *           description: Access denied
+ *           description: Forbidden
+ *           examples:
+ *             application/json:
+ *               {
+ *                 message: "Private document."
+ *               }
+ *           schema:
+ *             $ref: "#/definitions/Document"
  *         404:
- *           description: Document not found
+ *           description: Not Found
+ *           examples:
+ *             application/json:
+ *               {
+ *                 message: "Document does not exist."
+ *               }
+ *           schema:
+ *             $ref: "#/definitions/Document"
+ *         500:
+ *           description: Internal Server Error
+ *           examples:
+ *             application/json:
+ *               {
+ *                 message: "Error. Please try again."
+ *               }
+ *           schema:
+ *             $ref: "#/definitions/Document"
  *       security:
  *       - Authorization: []
  *     put:
  *       tags:
  *         - Documents
- *       summary: Updates a document
- *       description: This can only be done by the author
+ *       summary: Update a document
+ *       description: Update a document.
  *       operationId: updateDocument
  *       produces:
  *         - application/json
  *       consumes:
  *         - application/x-www-form-urlencoded
  *       parameters:
+ *         - in: header
+ *           name: Authorization
+ *           description: token from login
+ *           required: true 
  *         - name: id
- *           in: query
- *           description: document title that need to be updated
+ *           in: path
+ *           description: id of the document that needs to be updated.
  *           required: true
  *           type: integer
  *         - in: formData
@@ -196,34 +297,102 @@ const DocumentsRoute = (router) => {
  *           required: false
  *       responses:
  *         200:
- *           description: ''
+ *           description: OK
+ *           examples:
+ *             application/json:
+ *               {
+ *                 id: updatedDocument.id,
+ *                 title: updatedDocument.title,
+ *                 content: updatedDocument.content,
+ *                 accessType: updatedDocument.accessType,
+ *                 userId: updatedDocument.userId
+ *               }
  *           schema:
- *             "$ref": "#/definitions/Document"
- *         400:
- *           description: Invalid document id supplied
+ *             $ref: "#/definitions/Document"
  *         403:
- *           description: You dont have that kinda privilege
+ *           description: Forbidden
+ *           examples:
+ *             application/json:
+ *               {
+ *               message: "Document ID cannot be changed."
+ *               }
+ *           schema:
+ *             $ref: "#/definitions/Document"
+ *         404:
+ *           description: Not Found
+ *           examples:
+ *             application/json:
+ *               {
+ *                 message: "Document does not exist."
+ *              }
+ *           schema:
+ *             $ref: "#/definitions/Document"
+ *         500:
+ *           description: Internal Server Error
+ *           examples:
+ *             application/json:
+ *               {
+ *                 message: "Error. Please try again."
+ *               }
+ *           schema:
+ *             $ref: "#/definitions/Document"
  *       security:
  *       - Authorization: []
  *     delete:
  *       tags:
  *         - Documents
- *       summary: Deletes document from system
- *       description: This can only be done by the author
+ *       summary: Delete a document
+ *       description: Delete a document by its id
  *       operationId: deleteDocument
  *       produces:
  *         - application/json
  *       parameters:
+ *         - in: header
+ *           name: Authorization
+ *           description: token from login
+ *           required: true 
  *         - name: id
- *           in: query
- *           description: The document that needs to be deleted
+ *           in: path
+ *           description: The id of the document that needs to be deleted.
  *           required: true
  *           type: integer
  *       responses:
- *         203:
- *           description: Document deleted
+ *         200:
+ *           description: OK
+ *           examples:
+ *             application/json:
+ *               {
+ *                 message: "Document deleted successfully."
+ *               }
+ *           schema:
+ *             $ref: "#/definitions/Document"
  *         403:
- *           description: You dont have that privilege
+ *           description: Forbidden
+ *           examples:
+ *             application/json:
+ *               {
+ *                 message: "You can delete only your documents."
+ *               }
+ *           schema:
+ *             $ref: "#/definitions/Document"
+ *         404:
+ *           description: Not Found
+ *           examples:
+ *             application/json:
+ *               {
+ *                 message: "Document does not exist."
+ *               }
+ *           schema:
+ *             $ref: "#/definitions/Document"
+ *         500:
+ *           description: Internal Server Error
+ *           examples:
+ *             application/json:
+ *               {
+ *                 message: "Error. Please try again."
+ *               }
+ *           schema:
+ *             $ref: "#/definitions/Document"
  *       security:
  *       - Authorization: []
  */ 
@@ -236,28 +405,58 @@ const DocumentsRoute = (router) => {
 /** 
  * @swagger
  * paths:
- *   /api/v1/search/documents:
+ *   /api/v1/search/documents/:
  *      get:
  *        tags:
  *          - Documents
- *        summary: Fetch documents using a search parameter
- *        description: ''
- *        operationId: fetchAllDocuments.
+ *        summary: Search for a document by title
+ *        description: Enter the title of a document to search for.
+ *        operationId: searchDocuments
  *        produces:
  *          - application/json
  *        parameters:
- *          - name: title
+ *          - in: header
+ *            name: Authorization
+ *            description: token from login
+ *            required: true
+ *          - name: q
  *            in: query
- *            description: 'The name that needs to be fetched. Use pepper for testing. '
+ *            description: title of document(s) to search
  *            required: true
  *            type: string
  *        responses:
  *          200:
- *            description: successful operation
+ *            description: OK
+ *            examples:
+ *              application/json:
+ *                {
+ *                   pagination: {
+ *                     totalCount: 1,
+ *                     currentPage: 1,
+ *                     pageCount: 1,
+ *                     pageSize: 1
+ *               },
+ *                   users: [
+ *               {
+ *                     id: 1,
+ *                     title: Successful,
+ *                     content: Everyday in everyway, through the grace of God, I am,
+ *                     accessType: public,
+ *                     userId: 5
+ *               }
+ *             ]
+ *            }
  *            schema:
- *              "$ref": '#/definitions/Document'
- *          400:
- *            description: Invalid title supplied
+ *              $ref: '#/definitions/Document'
+ *          404:
+ *            description: Not Found
+ *            examples:
+ *              application/json:
+ *                {
+ *                  message: "Search term does not match any document."
+ *                }
+ *            schema:
+ *             $ref: "#/definitions/Document"
  *        security:
  *        - Authorization: []
  */           
