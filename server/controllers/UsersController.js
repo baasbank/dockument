@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import models from '../models';
-import helper from '../helper/Helper';
+import Helper from '../helper/Helper';
 
 require('dotenv').config();
 
@@ -106,8 +106,8 @@ class UsersController {
             token
           });
         } else {
-          res.status(401)
-            .send({ message: 'Invalid login credentials. Try again.' });
+          res.status(400)
+            .send({ message: 'Password mismatch.' });
         }
       })
       .catch(error => res.status(400).send(error));
@@ -130,7 +130,8 @@ class UsersController {
               allUsers:
               users.map(user => (
                 {
-                  name: user.fullName,
+                  id: user.id,
+                  fullName: user.fullName,
                   email: user.email,
                   roleType: user.roleType,
                 }
@@ -147,7 +148,7 @@ class UsersController {
       User
         .findAndCountAll(query)
         .then((users) => {
-          const pagination = helper.paginate(
+          const pagination = Helper.paginate(
             query.limit, query.offset, users.count
           );
           return res.status(200).send({
@@ -178,17 +179,17 @@ class UsersController {
       .findById(req.params.id)
       .then((user) => {
         if (!user) {
-          throw new Error('Cannot find user.');
+          return res.status(400).send({ message: 'Cannot find user.' });
         }
         return res.status(200).send({
+          id: user.id,
           name: user.fullName,
           email: user.email,
           role: user.roleType,
         });
       })
-      .catch((error) => {
-        const errorMessage = error.message || error;
-        res.status(400).send(errorMessage);
+      .catch(() => {
+        res.status(500).send({ message: 'Error. Please try again.' });
       });
   }
 
@@ -288,11 +289,11 @@ class UsersController {
         }
         user
           .destroy()
-          .then(() => res.status(410).send({
+          .then(() => res.status(200).send({
             message: 'User deleted successfully.',
           }));
       })
-      .catch(() => res.status(400).send(
+      .catch(() => res.status(500).send(
         'Error. Please try again',
       ));
   }
@@ -328,16 +329,24 @@ class UsersController {
     User
       .findAndCountAll(query)
       .then((users) => {
-        const pagination = helper.paginate(
+        const pagination = Helper.paginate(
           query.limit, query.offset, users.count
         );
         if (!users.rows.length) {
           return res.status(404).send({
-            message: 'Search term does not match any user',
+            message: 'Search term does not match any user.',
           });
         } else {
           res.status(200).send({
-            pagination, users: users.rows,
+            pagination,
+            users: users.rows.map(user => (
+              {
+                id: user.id,
+                fullName: user.fullName,
+                email: user.email,
+                roleType: user.roleType,
+              }
+            ))
           });
         }
       });
@@ -374,7 +383,7 @@ class UsersController {
               updatedAt: document.updatedAt,
             }));
 
-          const pagination = helper.paginate(
+          const pagination = Helper.paginate(
             query.limit, query.offset, documents.count
           );
           if (!documents.rows.length) {
