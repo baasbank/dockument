@@ -51,22 +51,47 @@ const RolesRoute = (router) => {
  *        tags:
  *          - Role
  *        summary: Create a new role
- *        description: Add a new role to already existing roles
+ *        description: Add a new role to already existing roles.
  *        operationId: addRole
  *        produces:
  *          - application/json
  *        parameters:
+ *          - in: header
+ *            name: Authorization
+ *            description: token from login
+ *            required: true 
  *          - in: formData
  *            name: roleType
  *            description: role to be added
  *            required: true
  *        responses:
- *          201:
- *            description: Role inserted
+ *          200:
+ *            description: OK
+ *            examples:
+ *              application/json:
+ *                {
+ *                  message: "Role already exists."
+ *                }
  *            schema:
- *              "$ref": '#/definitions/Role'
+ *              $ref: '#/definitions/Role'
+ *          201:
+ *            description: Created
+ *            examples:
+ *              application/json:
+ *                {
+ *                  message: "Role created successfully."
+ *                }
+ *            schema:
+ *              $ref: '#/definitions/Role'
  *          400:
- *            description: Access Denied
+ *            description: Bad Request
+ *            examples:
+ *                application/json:
+ *                  {
+ *                  message: "roleType field is required."
+ *                  }
+ *            schema:
+ *              $ref: '#/definitions/Role'
  *        security:
  *        - Authorization: []
  */
