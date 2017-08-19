@@ -42,13 +42,18 @@ class DocumentsController {
       .then(document => res.status(201).send({
         message: 'Document created.',
         document: {
-          documentId: document.id,
+          id: document.id,
           title: document.title,
           content: document.content,
           accessType: document.accessType,
-          ownerId: document.userId
+          userId: document.userId
         }
-      }));
+      }))
+      .catch(() => {
+        return res.status(500).send({
+          message: 'Error. Please try again.'
+        })
+      });
   }
 
   /**
@@ -60,7 +65,7 @@ class DocumentsController {
    *@returns {object} json - payload
    * @memberOf DocumentsController
    */
-  static getAllDocuments(req, res) {
+  static fetchAllDocuments(req, res) {
     if ((!req.query.limit) && (!req.query.offset)) {
       Document.findAll()
         .then((documents) => {
@@ -69,23 +74,32 @@ class DocumentsController {
               message: 'No documents found.'
             });
           }
-          res.status(200).send(
-            {
-              allDocuments:
-              documents.map((document) => {
-                return (
-                  {
-                    title: document.title,
-                    content: document.content,
-                    access: document.accessType,
-                    userId: document.userId,
-                  }
-                );
-              })
-            });
+          if (req.decoded.roleType === 'admin') {
+            return res.status(200).send(
+              {
+                allDocuments:
+                documents.map((document) => {
+                  return (
+                    {
+                      id: document.id,
+                      title: document.title,
+                      content: document.content,
+                      accessType: document.accessType,
+                      userId: document.userId,
+                    }
+                  );
+                })
+              });
+          }
+          return res.status(200).send({
+            allDocuments:
+            documents.filter((document) => {
+              return document.accessType === 'public';
+            })
+          });
         })
         .catch(() => res.status(500).send({
-          message: 'An error occured.',
+          message: 'Error. Please try again.',
         }));
     } else {
       const query = {};
@@ -100,6 +114,11 @@ class DocumentsController {
           res.status(200).send({
             pagination, documents: documents.rows,
           });
+        })
+        .catch(() => {
+          return res.status(500).send({
+            message: 'Error. Please try again.'
+          })
         });
     }
   }
@@ -112,7 +131,7 @@ class DocumentsController {
    *@returns {object} json - payload
    * @memberOf DocumentsController
    */
-  static findADocument(req, res) {
+  static fetchDocumentById(req, res) {
     return Document
       .findById(req.params.id)
       .then((document) => {
@@ -129,16 +148,15 @@ class DocumentsController {
             });
         }
         return res.status(200).send({
-          documentId: document.id,
+          id: document.id,
           title: document.title,
           content: document.content,
-          access: document.accessType,
-          ownerId: document.userId,
+          accessType: document.accessType,
+          userId: document.userId,
         });
       })
-      .catch((error) => {
-        const errorMessage = error.message || error;
-        res.status(400).send(errorMessage);
+      .catch(() => {
+        res.status(500).send({ message: 'Error. Please try again.' });
       });
   }
 
@@ -150,7 +168,7 @@ class DocumentsController {
    * @returns {object} json - payload
    * @memberOf DocumentsController
    */
-  static updateDocument(req, res) {
+  static updateDocumentById(req, res) {
     Document
       .findById(req.params.id)
       .then((document) => {
@@ -187,12 +205,18 @@ class DocumentsController {
           .update({
             title: req.body.title || document.title,
             content: req.body.content || document.content,
-            access: req.body.accessType || document.accessType,
+            accessType: req.body.accessType || document.accessType,
             userId: document.userId,
           })
-          .then(() => res.status(200).send({
+          .then(updatedDocument => res.status(200).send({
             message: 'Update Successful!',
-            document,
+            document: {
+              id: updatedDocument.id,
+              title: updatedDocument.title,
+              content: updatedDocument.content,
+              accessType: updatedDocument.accessType,
+              userId: updatedDocument.userId
+            }
           }))
           .catch(() => res.status(500).send({
             message: 'Error. Please try again.',
@@ -211,7 +235,7 @@ class DocumentsController {
     * @returns {object} json - payload
     * @memberOf DocumentsController
     */
-  static deleteADocument(req, res) {
+  static deleteDocumentById(req, res) {
     Document
       .findById(req.params.id)
       .then((document) => {
@@ -228,7 +252,7 @@ class DocumentsController {
         }
         document
           .destroy()
-          .then(() => res.status(410).send({
+          .then(() => res.status(200).send({
             message: 'Document deleted successfully.',
           }));
       })
@@ -245,16 +269,14 @@ class DocumentsController {
    * @returns {object} json - payload
    * @memberOf DocumentsController
    */
-  static searchDocuments(req, res) {
+  static searchForDocuments(req, res) {
     const searchTerm = req.query.q.trim();
 
     const query = {
       where: {
-        $or: [{
-          title: {
-            $iLike: `%${searchTerm}%`,
-          },
-        }],
+        title: {
+          $iLike: `%${searchTerm}%`,
+        },
       },
     };
 
@@ -272,7 +294,16 @@ class DocumentsController {
           });
         }
         res.status(200).send({
-          pagination, documents: documents.rows,
+          pagination,
+          documents: documents.rows.map(document => (
+            {
+              id: document.id,
+              title: document.title,
+              content: document.content,
+              accessType: document.accessType,
+              userId: document.userId
+            }
+          ))
         });
       });
   }

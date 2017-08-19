@@ -49,15 +49,15 @@ describe('Documents', () => {
   });
 
   describe('POST: /documents/', () => {
-    it('should create a new document', (done) => {
+    it('should create a new document given a title, content, and accessType', (done) => {
       chai.request(app)
         .post('/api/v1/documents')
         .send(documentOne)
-        .set({ 'Authorization': superUserToken })
+        .set({ Authorization: superUserToken })
         .end((err, res) => {
           expect(res.status).to.equal(201);
           expect(res.body).to.have.keys(['message', 'document']);
-          expect(res.body.document.ownerId).to.equal(2);
+          expect(res.body.document.userId).to.equal(2);
           expect(res.body.document.accessType).to.eql('public');
           done();
         });
@@ -66,7 +66,7 @@ describe('Documents', () => {
       chai.request(app)
         .post('/api/v1/documents')
         .send(fakeDocument)
-        .set({ 'Authorization': superUserToken })
+        .set({ Authorization: superUserToken })
         .end((err, res) => {
           expect(res.status).to.equal(400);
           expect(res.body).to.have.keys(['message']);
@@ -78,7 +78,7 @@ describe('Documents', () => {
       chai.request(app)
         .post('/api/v1/documents')
         .send({ content: 'lorem ipsum ipsum lorem', accessType: 'public' })
-        .set({ 'Authorization': superUserToken })
+        .set({ Authorization: superUserToken })
         .end((err, res) => {
           expect(res.status).to.equal(400);
           expect(res.body).to.have.keys(['message']);
@@ -86,11 +86,11 @@ describe('Documents', () => {
           done();
         });
     });
-    it('should not create a new document if title field is not supplied', (done) => {
+    it('should not create a new document if content field is not supplied', (done) => {
       chai.request(app)
         .post('/api/v1/documents')
         .send({ title: 'lorem ipsum', accessType: 'public' })
-        .set({ 'Authorization': superUserToken })
+        .set({ Authorization: superUserToken })
         .end((err, res) => {
           expect(res.status).to.equal(400);
           expect(res.body).to.have.keys(['message']);
@@ -103,13 +103,13 @@ describe('Documents', () => {
     it('should display all documents', (done) => {
       chai.request(app)
         .get('/api/v1/documents')
-        .set({ 'Authorization': adminToken })
+        .set({ Authorization: adminToken })
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(Array.isArray(res.body.allDocuments));
           expect(res.body.allDocuments[0].title).to.eql('My first document');
           expect(res.body.allDocuments[1].content).to.eql('second lorem ipsum and the rest of it');
-          expect(res.body.allDocuments[2].access).to.eql('role');
+          expect(res.body.allDocuments[2].accessType).to.eql('role');
           expect(res.body.allDocuments[3].userId).to.equal(2);
           done();
         });
@@ -117,7 +117,7 @@ describe('Documents', () => {
     it('should fetch and paginate all documents when limit and offset are supplied', (done) => {
       chai.request(app)
         .get('/api/v1/documents?limit=2&offset=0')
-        .set({ 'Authorization': adminToken })
+        .set({ Authorization: adminToken })
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body).to.have.keys(['pagination', 'documents']);
@@ -137,22 +137,22 @@ describe('Documents', () => {
     it('should fetch a document given its id', (done) => {
       chai.request(app)
         .get('/api/v1/documents/1')
-        .set({ 'Authorization': superUserToken })
+        .set({ Authorization: superUserToken })
         .end((err, res) => {
           expect(res.status).to.equal(200);
-          expect(res.body).to.have.keys(['documentId', 'title', 'content', 'access', 'ownerId']);
-          expect(res.body.documentId).to.equal(1);
+          expect(res.body).to.have.keys(['id', 'title', 'content', 'accessType', 'userId']);
+          expect(res.body.id).to.equal(1);
           expect(res.body.title).to.eql('My first document');
           expect(res.body.content).to.eql('lorem ipsum and the rest of it');
-          expect(res.body.access).to.eql('public');
-          expect(res.body.ownerId).to.equal(1);
+          expect(res.body.accessType).to.eql('public');
+          expect(res.body.userId).to.equal(1);
           done();
         });
     });
     it('should return the specified message if the document does not exist', (done) => {
       chai.request(app)
         .get('/api/v1/documents/10')
-        .set({ 'Authorization': superUserToken })
+        .set({ Authorization: superUserToken })
         .end((err, res) => {
           expect(res.status).to.equal(404);
           expect(res.body).to.have.keys(['message']);
@@ -163,7 +163,7 @@ describe('Documents', () => {
     it('should not allow a user fetch another user private document by id', (done) => {
       chai.request(app)
         .get('/api/v1/documents/2')
-        .set({ 'Authorization': regularUserToken })
+        .set({ Authorization: regularUserToken })
         .end((err, res) => {
           expect(res.status).to.equal(403);
           expect(res.body).to.have.keys(['message']);
@@ -177,7 +177,7 @@ describe('Documents', () => {
       chai.request(app)
         .put('/api/v1/documents/4')
         .send(updateDocument)
-        .set({ 'Authorization': superUserToken })
+        .set({ Authorization: superUserToken })
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body).to.have.keys(['message', 'document']);
@@ -193,7 +193,7 @@ describe('Documents', () => {
       chai.request(app)
         .put('/api/v1/documents/4')
         .send(updateDocument)
-        .set({ 'Authorization': adminToken })
+        .set({ Authorization: adminToken })
         .end((err, res) => {
           expect(res.status).to.equal(403);
           expect(res.body).to.have.keys(['message']);
@@ -204,7 +204,7 @@ describe('Documents', () => {
     it('should return the specified message for id not in the database', (done) => {
       chai.request(app)
         .put('/api/v1/documents/10')
-        .set({ 'Authorization': adminToken })
+        .set({ Authorization: adminToken })
         .end((err, res) => {
           expect(res.status).to.equal(404);
           expect(res.body).to.have.keys(['message']);
@@ -216,7 +216,7 @@ describe('Documents', () => {
       chai.request(app)
         .put('/api/v1/documents/4')
         .send({ id: 5 })
-        .set({ 'Authorization': superUserToken })
+        .set({ Authorization: superUserToken })
         .end((err, res) => {
           expect(res.status).to.equal(403);
           expect(res.body).to.have.keys(['message']);
@@ -228,7 +228,7 @@ describe('Documents', () => {
       chai.request(app)
         .put('/api/v1/documents/1')
         .send({ createdAt: '7674499404' })
-        .set({ 'Authorization': adminToken })
+        .set({ Authorization: adminToken })
         .end((err, res) => {
           expect(res.status).to.equal(403);
           expect(res.body).to.have.keys(['message']);
@@ -240,7 +240,7 @@ describe('Documents', () => {
       chai.request(app)
         .put('/api/v1/documents/1')
         .send({ updatedAt: '7674499404' })
-        .set({ 'Authorization': adminToken })
+        .set({ Authorization: adminToken })
         .end((err, res) => {
           expect(res.status).to.equal(403);
           expect(res.body).to.have.keys(['message']);
@@ -253,9 +253,9 @@ describe('Documents', () => {
     it('should allow the owner of a document delete it', (done) => {
       chai.request(app)
         .delete('/api/v1/documents/2')
-        .set({ 'Authorization': superUserToken })
+        .set({ Authorization: superUserToken })
         .end((err, res) => {
-          expect(res.status).to.equal(410);
+          expect(res.status).to.equal(200);
           expect(res.body).to.have.keys(['message']);
           expect(res.body.message).to.eql('Document deleted successfully.');
           done();
@@ -264,7 +264,7 @@ describe('Documents', () => {
     it('should not allow a user delete another user document', (done) => {
       chai.request(app)
         .delete('/api/v1/documents/4')
-        .set({ 'Authorization': adminToken })
+        .set({ Authorization: adminToken })
         .end((err, res) => {
           expect(res.status).to.equal(403);
           expect(res.body).to.have.keys(['message']);
@@ -275,7 +275,7 @@ describe('Documents', () => {
     it('should return the specified message for id not in the database', (done) => {
       chai.request(app)
         .delete('/api/v1/documents/10')
-        .set({ 'Authorization': superUserToken })
+        .set({ Authorization: superUserToken })
         .end((err, res) => {
           expect(res.status).to.equal(404);
           expect(res.body).to.have.keys(['message']);
@@ -288,7 +288,7 @@ describe('Documents', () => {
     it('should allow a user search for documents by title', (done) => {
       chai.request(app)
         .get('/api/v1/search/documents?q=first')
-        .set({ 'Authorization': superUserToken })
+        .set({ Authorization: superUserToken })
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body).to.have.keys(['pagination', 'documents']);
@@ -306,7 +306,7 @@ describe('Documents', () => {
     it('should return a message when document is not found', (done) => {
       chai.request(app)
         .get('/api/v1/search/documents?q=firsthead')
-        .set({ 'Authorization': superUserToken })
+        .set({ Authorization: superUserToken })
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body).to.have.keys(['message']);

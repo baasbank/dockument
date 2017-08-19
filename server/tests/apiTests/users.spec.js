@@ -52,7 +52,7 @@ describe('Users', () => {
     done();
   });
   describe('POST: /users/login', () => {
-    it('should log in a user and return a token', (done) => {
+    it('should log in a user and return a token given valid email and password', (done) => {
       chai.request(app)
         .post('/api/v1/users/login')
         .send(admin).end((err, res) => {
@@ -88,9 +88,9 @@ describe('Users', () => {
         .post('/api/v1/users/login')
         .send(userPasswordMismatch)
         .end((err, res) => {
-          expect(res.status).to.equal(401);
+          expect(res.status).to.equal(400);
           expect(res.body).to.have.keys(['message']);
-          expect(res.body.message).to.eql('Invalid login credentials. Try again.');
+          expect(res.body.message).to.eql('Password mismatch.');
           done();
         });
     });
@@ -129,13 +129,15 @@ describe('Users', () => {
           done();
         });
     });
-    it('should create a new user', (done) => {
+    it('should create a new user given a name, a valid email, and password', (done) => {
       chai.request(app)
         .post('/api/v1/users/')
         .send(fakeEsther).end((err, res) => {
           expect(res.status).to.equal(201);
           expect(res.body).to.have.keys(['message', 'user']);
           expect(res.body.message).to.eql('signup successful');
+          expect(res.body.user.fullName).to.eql('Esther Akwevagbe');
+          expect(res.body.user.email).to.eql('esther@fake.com');
           done();
         });
     });
@@ -144,11 +146,11 @@ describe('Users', () => {
     it('should return all users if user is admin', (done) => {
       chai.request(app)
         .get('/api/v1/users')
-        .set({ 'Authorization': adminToken })
+        .set({ Authorization: adminToken })
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(Array.isArray(res.body.allUsers));
-          expect(res.body.allUsers[0].name).to.eql('Baas Bank');
+          expect(res.body.allUsers[0].fullName).to.eql('Baas Bank');
           expect(res.body.allUsers[0].email).to.eql('baas@test.com');
           expect(res.body.allUsers[1].email).to.eql('john@test.com');
           expect(res.body.allUsers[1].roleType).to.eql('super user');
@@ -158,7 +160,7 @@ describe('Users', () => {
     it('should return a message if a regular user accesses it', (done) => {
       chai.request(app)
         .get('/api/v1/users')
-        .set({ 'Authorization': regularUserToken })
+        .set({ Authorization: regularUserToken })
         .end((err, res) => {
           expect(res.status).to.equal(403);
           expect(res.body).to.have.keys(['message']);
@@ -169,7 +171,7 @@ describe('Users', () => {
     it('should paginate users if user is admin and limit and query is supplied', (done) => {
       chai.request(app)
         .get('/api/v1/users?limit=2&offset=0')
-        .set({ 'Authorization': adminToken })
+        .set({ Authorization: adminToken })
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(Array.isArray(res.body.users));
@@ -192,30 +194,30 @@ describe('Users', () => {
         .set({ Authorization: regularUserToken })
         .end((err, res) => {
           expect(res.status).to.equal(200);
-          expect(res.body).to.have.keys(['name', 'email', 'role']);
-          expect(res.body.name).to.eql('Baas Bank');
+          expect(res.body).to.have.keys(['fullName', 'email', 'role']);
+          expect(res.body.fullName).to.eql('Baas Bank');
           expect(res.body.email).to.eql('baas@test.com');
           expect(res.body.role).to.eql('admin');
           done();
         });
     });
-    it('should return a message for invalid user id', (done) => {
+    it('should return a message given an invalid user id', (done) => {
       chai.request(app)
         .get('/api/v1/users/jkfjdkjfld')
-        .set({ 'Authorization': adminToken })
+        .set({ Authorization: adminToken })
         .end((err, res) => {
           expect(res.status).to.equal(400);
-          expect(err.response.text).to.eql(`invalid input syntax for integer: "jkfjdkjfld"`);
+          expect(res.body.message).to.eql('Error. Please check the id and try again.');
           done();
         });
     });
   });
   describe('PUT: /users/:id', () => {
-    it('should allow a user update her profile', (done) => {
+    it('should allow a user update her profile given an id', (done) => {
       chai.request(app)
         .put('/api/v1/users/1')
         .send(updateUser)
-        .set({ 'Authorization': adminToken })
+        .set({ Authorization: adminToken })
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body).to.have.keys(['message', 'user']);
@@ -230,7 +232,7 @@ describe('Users', () => {
       chai.request(app)
         .put('/api/v1/users/1')
         .send(updateUser)
-        .set({ 'Authorization': regularUserToken })
+        .set({ Authorization: regularUserToken })
         .end((err, res) => {
           expect(res.status).to.equal(403);
           expect(res.body).to.have.keys(['message']);
@@ -242,7 +244,7 @@ describe('Users', () => {
       chai.request(app)
         .put('/api/v1/users/4')
         .send({ id: 5 })
-        .set({ 'Authorization': regularUserToken })
+        .set({ Authorization: regularUserToken })
         .end((err, res) => {
           expect(res.status).to.equal(403);
           expect(res.body).to.have.keys(['message']);
@@ -250,11 +252,11 @@ describe('Users', () => {
           done();
         });
     });
-    it('should allow an admin update a user role type', (done) => {
+    it('should allow an admin update a user role type given an id', (done) => {
       chai.request(app)
         .put('/api/v1/users/3')
-        .send({ roleType: 'super user' })
-        .set({ 'Authorization': adminToken })
+        .send({ roleType: 'super user', email: 'blessing@test.com' })
+        .set({ Authorization: adminToken })
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body).to.have.keys(['message', 'user']);
@@ -265,34 +267,24 @@ describe('Users', () => {
     });
   });
   describe('DELETE: /users/:id', () => {
-    it('should allow the admin delete a user', (done) => {
+    it('should allow the admin delete a user by id', (done) => {
       chai.request(app)
         .delete('/api/v1/users/3')
-        .set({ 'Authorization': adminToken })
+        .set({ Authorization: adminToken })
         .end((err, res) => {
-          expect(res.status).to.equal(410);
+          expect(res.status).to.equal(200);
           expect(res.body).to.have.keys(['message']);
           expect(res.body.message).to.eql('User deleted successfully.');
-          done();
-        });
-    });
-    it('should return a message for invalid user id', (done) => {
-      chai.request(app)
-        .delete('/api/v1/users/jkfjdkjfld')
-        .set({ 'Authorization': adminToken })
-        .end((err, res) => {
-          expect(res.status).to.equal(400);
-          expect(err.response.text).to.eql('Error. Please try again');
           done();
         });
     });
     it('should return a message for user id not in the database', (done) => {
       chai.request(app)
         .delete('/api/v1/users/5')
-        .set({ 'Authorization': adminToken })
+        .set({ Authorization: adminToken })
         .end((err, res) => {
           expect(res.status).to.equal(404);
-          expect(res.body.message).to.eql('User does not exist');
+          expect(res.body.message).to.eql('Cannot find user.');
           done();
         });
     });
@@ -301,7 +293,7 @@ describe('Users', () => {
     it('should allow the admin search for a user by name', (done) => {
       chai.request(app)
         .get('/api/v1/search/users?q=john')
-        .set({ 'Authorization': adminToken })
+        .set({ Authorization: adminToken })
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body).to.have.keys(['pagination', 'users']);
@@ -314,11 +306,11 @@ describe('Users', () => {
     it('should return a message if no user is found', (done) => {
       chai.request(app)
         .get('/api/v1/search/users?q=temilaj')
-        .set({ 'Authorization': adminToken })
+        .set({ Authorization: adminToken })
         .end((err, res) => {
           expect(res.status).to.equal(404);
           expect(res.body).to.have.keys(['message']);
-          expect(res.body.message).to.eql('Search term does not match any user');
+          expect(res.body.message).to.eql('Search term does not match any user.');
           done();
         });
     });
@@ -333,14 +325,14 @@ describe('Users', () => {
           expect(res.body).to.have.keys(['pagination', 'documents']);
           expect(res.body.documents[0].title).to.eql('My first document');
           expect(res.body.documents[0].content).to.eql('lorem ipsum and the rest of it');
-          expect(res.body.documents[0].OwnerId).to.equal(1);
+          expect(res.body.documents[0].userId).to.equal(1);
           done();
         });
     });
     it('should return a message for user id not in the database', (done) => {
       chai.request(app)
         .get('/api/v1/users/5/documents')
-        .set({ 'Authorization': adminToken })
+        .set({ Authorization: adminToken })
         .end((err, res) => {
           expect(res.status).to.equal(404);
           expect(res.body.message).to.eql('This user does not have any document.');

@@ -27,7 +27,7 @@ describe('User Model', () => {
     });
   });
   describe('models.User.update', () => {
-    it('should update a user', (done) => {
+    it('should update a user given', (done) => {
       models.User.findById(dummyId)
         .then((user) => {
           user.update({ email: 'audax@test.com', password: 'audaxes' })

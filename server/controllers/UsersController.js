@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import models from '../models';
-import helper from '../helper/Helper';
+import Helper from '../helper/Helper';
 
 require('dotenv').config();
 
@@ -40,10 +40,17 @@ class UsersController {
         message: 'password field is required.'
       });
     }
+    req.check('email', 'Please enter a valid email').isEmail();
+    const errors = req.validationErrors();
+    if (errors) {
+      return res.status(400).send({
+        errors
+      });
+    }
     User.findOne({ where: { email: req.body.email } })
       .then((existingUser) => {
         if (existingUser) {
-          res.status(400).send({
+          return res.status(400).send({
             message: 'User already exists!',
           });
         }
@@ -57,7 +64,7 @@ class UsersController {
             message: 'signup successful',
             user: {
               id: user.id,
-              name: user.fullName,
+              fullName: user.fullName,
               email: user.email,
               roleType: user.roleType,
             }
@@ -65,8 +72,10 @@ class UsersController {
           .catch(() => res.status(500).send({
             message: 'Error. Please try again.',
           }));
-      }).catch((error) => {
-        res.status(400).json(error);
+      }).catch(() => {
+        res.status(500).send({
+          message: 'Error. Please try again.'
+        });
       });
   }
 
@@ -90,8 +99,20 @@ class UsersController {
         message: 'password field is required.'
       });
     }
+    req.check('email', 'Please enter a valid email').isEmail();
+    const errors = req.validationErrors();
+    if (errors) {
+      return res.status(400).send({
+        errors
+      });
+    }
     User.findOne({ where: { email: req.body.email } })
       .then((user) => {
+        if (!user) {
+          return res.status(404).send({
+            message: 'Cannot find user.'
+          });
+        }
         if (user && bcrypt.compareSync(req.body.password, user.password)) {
           const userData = {
             userId: user.id,
@@ -106,11 +127,11 @@ class UsersController {
             token
           });
         } else {
-          res.status(401)
-            .send({ message: 'Invalid login credentials. Try again.' });
+          res.status(400)
+            .send({ message: 'Password mismatch.' });
         }
       })
-      .catch(error => res.status(400).send(error));
+      .catch(() => res.status(500).send({ message: 'Error. Please try again.' }));
   }
   /**
    * Get all users
@@ -121,24 +142,30 @@ class UsersController {
    *@returns {object} json - payload
    * @memberOf UsersController
    */
-  static getAllUsers(req, res) {
+  static fetchAllUsers(req, res) {
     if ((!req.query.limit) && (!req.query.offset)) {
       User.findAll()
         .then((users) => {
+          if (!users) {
+            return res.status(200).send({
+              message: 'No user.'
+            });
+          }
           return res.status(200).send(
             {
               allUsers:
               users.map(user => (
                 {
-                  name: user.fullName,
+                  id: user.id,
+                  fullName: user.fullName,
                   email: user.email,
                   roleType: user.roleType,
                 }
               ))
             });
         })
-        .catch(() => res.status(400).send({
-          message: 'An error occured.',
+        .catch(() => res.status(500).send({
+          message: 'Error. Please try again.',
         }));
     } else {
       const query = {};
@@ -147,7 +174,7 @@ class UsersController {
       User
         .findAndCountAll(query)
         .then((users) => {
-          const pagination = helper.paginate(
+          const pagination = Helper.paginate(
             query.limit, query.offset, users.count
           );
           return res.status(200).send({
@@ -173,22 +200,21 @@ class UsersController {
    *@returns {object} user - the user's details
    * @memberOf UsersController
    */
-  static findAUser(req, res) {
+  static fetchUserById(req, res) {
     return User
       .findById(req.params.id)
       .then((user) => {
         if (!user) {
-          throw new Error('Cannot find user.');
+          return res.status(500).send({ message: 'Error. Please try again.' });
         }
         return res.status(200).send({
-          name: user.fullName,
+          fullName: user.fullName,
           email: user.email,
           role: user.roleType,
         });
       })
-      .catch((error) => {
-        const errorMessage = error.message || error;
-        res.status(400).send(errorMessage);
+      .catch(() => {
+        res.status(400).send({ message: 'Error. Please check the id and try again.' });
       });
   }
 
@@ -201,7 +227,7 @@ class UsersController {
    * @returns {object} json - payload
    * @memberOf UsersController
    */
-  static updateUser(req, res) {
+  static updateUserById(req, res) {
     Role.findOne({ where: { roleType: req.decoded.roleType } })
       .then((role) => {
         User
@@ -246,6 +272,13 @@ class UsersController {
                 'You can update only your profile.',
               });
             }
+            req.check('email', 'Please enter a valid email').isEmail();
+            const errors = req.validationErrors();
+            if (errors) {
+              return res.status(400).send({
+                errors
+              });
+            }
             user
               .update({
                 fullName: req.body.fullName || user.fullName,
@@ -277,23 +310,23 @@ class UsersController {
     * @returns {object} message - delete message
     * @memberOf UsersController
     */
-  static deleteAUser(req, res) {
+  static deleteUserById(req, res) {
     User
       .findById(req.params.id)
       .then((user) => {
         if (!user) {
-          return res.status(404).json({
-            message: 'User does not exist',
+          return res.status(404).send({
+            message: 'Cannot find user.',
           });
         }
         user
           .destroy()
-          .then(() => res.status(410).send({
+          .then(() => res.status(200).send({
             message: 'User deleted successfully.',
           }));
       })
-      .catch(() => res.status(400).send(
-        'Error. Please try again',
+      .catch(() => res.status(500).send(
+        'Error. Please try again.',
       ));
   }
 
@@ -306,7 +339,7 @@ class UsersController {
    * @returns {object} json- payload
    * @memberOf UsersController
    */
-  static searchUsers(req, res) {
+  static searchForUsers(req, res) {
     const searchTerm = req.query.q.trim();
 
     const query = {
@@ -328,16 +361,24 @@ class UsersController {
     User
       .findAndCountAll(query)
       .then((users) => {
-        const pagination = helper.paginate(
+        const pagination = Helper.paginate(
           query.limit, query.offset, users.count
         );
         if (!users.rows.length) {
           return res.status(404).send({
-            message: 'Search term does not match any user',
+            message: 'Search term does not match any user.',
           });
         } else {
           res.status(200).send({
-            pagination, users: users.rows,
+            pagination,
+            users: users.rows.map(user => (
+              {
+                id: user.id,
+                fullName: user.fullName,
+                email: user.email,
+                roleType: user.roleType,
+              }
+            ))
           });
         }
       });
@@ -351,7 +392,7 @@ class UsersController {
    * @returns {object} json - payload
    * @memberOf UsersController
    */
-  static getUserDocuments(req, res) {
+  static fetchAllDocumentsOfAUser(req, res) {
     if ((parseInt(req.params.id, 10) === req.decoded.userId) || (req.decoded.roleType === 'admin')) {
       const query = {
         where: {
@@ -368,13 +409,13 @@ class UsersController {
               id: document.id,
               title: document.title,
               content: document.content,
-              access: document.accessType,
-              OwnerId: document.userId,
+              accessType: document.accessType,
+              userId: document.userId,
               createdAt: document.createdAt,
               updatedAt: document.updatedAt,
             }));
 
-          const pagination = helper.paginate(
+          const pagination = Helper.paginate(
             query.limit, query.offset, documents.count
           );
           if (!documents.rows.length) {

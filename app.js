@@ -4,7 +4,7 @@ import winston from 'winston';
 import express from 'express';
 import logger from 'morgan';
 import bodyParser from 'body-parser';
-import http from 'http';
+import expressValidator from 'express-validator';
 import routes from './server/routes/Index';
 
 // Set up the express app
@@ -48,6 +48,7 @@ app.use(logger('dev'));
 // Parse incoming requests data
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(expressValidator());
 
 // Use router for our routes
 routes(router);

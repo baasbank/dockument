@@ -29,8 +29,8 @@ export default {
     email: 'baasbank@test.com'
   },
   fakeEsther: {
-    fullName: faker.name.findName(),
-    email: faker.internet.email(),
+    fullName: 'Esther Akwevagbe',
+    email: 'esther@fake.com',
     password: 'esther',
   },
   fakeUserDetails: {

@@ -40,23 +40,22 @@ import Authenticate from '../middleware/Authenticate';
  *     - title
  *     - content
  *     - accessType
- *     - UserId
  *     properties:
  *       id:
  *         type: integer
  *         example: 1
  *       title:
  *         type: string
- *         example:  I'm a banana
+ *         example:  Greatest ever
  *       content:
  *         type: string
- *         example: Lorem Ipsum
+ *         example: I do not choose to be a common man.
  *       accessType: 
- *         type: integer
- *         example: 2
- *       UserId:
  *         type: string
  *         example: public
+ *       userId:
+ *         type: integer
+ *         example: 1
  *       createdAt:
  *         type: string
  *         format: int32
@@ -82,92 +81,146 @@ import Authenticate from '../middleware/Authenticate';
  * @param {function} router
  * @returns {void}
  */
-const UsersRoute = (router) => {
+
+const UsersRoutes = (router) => {
   // Create a new user, and get all users
   router.route('/users/')
-/**
+  /**
  * @swagger
  * paths:
  *   /api/v1/users/:
  *     get:
  *       tags:
  *         - User
- *       summary: gets all users
+ *       summary: Fetch all users
  *       operationId: fetchAllUsers
- *       description: |
- *         This route is only accessible to an admin to enable her get all users.
+ *       description: Get all users. **admin only**
  *       produces:
  *         - application/json
  *       parameters:
  *         - in: header
  *           name: Authorization
  *           description: token from login
- *           required: true        
+ *           required: true       
  *         - in: query
  *           name: limit
- *           description: Pagination limit
+ *           description: pagination limit
  *           required: false
+ *           schema:
+ *             type: number
+ *             example: 2
  *         - in: query
  *           name: offset
- *           description: Pagination offset
+ *           description: pagination offset
  *           required: false
  *       responses:
  *         200:
- *           description: all users in the database
+ *           description: OK
+ *           examples:
+ *             application/json:
+ *               {
+ *                 allUsers: [
+ *                   {
+ *                   id: 1,
+ *                   fullName: "Esther Falayi",
+ *                   email: "fals@test.com",
+ *                   roleType: "public"
+ *                   },
+ *                   {
+ *                   id: 1,
+ *                   fullName: "Esther Falayi",
+ *                   email: "fals@test.com",
+ *                   roleType: "public"
+ *                   },
+ *                   {
+ *                   id: 1,
+ *                   fullName: "Esther Falayi",
+ *                   email: "fals@test.com",
+ *                   roleType: "public"
+ *                   },
+ *                  ]
+ *               }
  *           schema:
- *             type: array
- *             items:
- *               $ref: '#/definitions/User'
- *         400:
- *           description: bad input parameter
+ *             $ref: '#/definitions/User'   
+ *         500:
+ *           description: Internal Server Error
+ *           examples:
+ *             application/json:
+ *               {
+ *                 message: "Error. Please try again."
+ *               }
  *       security:
  *       - Authorization: []
  *     post:
  *       tags:
  *         - User
- *       summary: adds a new user
+ *       summary: Create a new user
  *       operationId: createNewUser
- *       description: Adds a new user to the Users collection
+ *       description: Adds a new user to the Users collection.
  *       consumes:
- *         - application/json
+ *         - application/x-www-form-urlencoded
  *       produces:
  *         - application/json
  *       parameters:
  *         - in: formData
  *           name: fullName
- *           description: User's full name
+ *           description: user's full name
  *           required: true
  *         - in: formData
  *           name: email
- *           description: User's email address
+ *           description: user's email address
  *           required: true
  *         - in: formData
  *           name: password
- *           description: User's password
+ *           description: user's password
  *           required: true
  *       responses:
  *         201:
- *           description: User created
+ *           description: Created
+ *           examples:
+ *             application/json:
+ *               message: "signup successful"
+ *               user: {
+ *                 id: 5,
+ *                  name: "Temi Lajumoke",
+ *                  email: "temiboy@test.com",
+ *                  roleType: "admin"
+ *                 }
  *         400:
- *           description: invalid input, object invalid
- *         409:
- *           description: an existing item already exists
+ *           description: Bad Request
+ *           examples:
+ *             application/json:
+ *               {
+ *                 message: "password field is required."
+ *               }
+ *           schema:
+ *             $ref: '#/definitions/User'
+ *         500:
+ *           description: Internal Server Error
+ *           examples:
+ *             application/json:
+ *               {
+ *                 message: "Error. Please try again."
+ *               }
+ *           schema:
+ *             $ref: '#/definitions/User'
  */
-    .get(Authenticate.verifyToken, Authenticate.hasAdminAccess, UsersController.getAllUsers)
+
+    .get(Authenticate.verifyToken, Authenticate.hasAdminAccess, UsersController.fetchAllUsers)
     .post(UsersController.createUser);
 
   // Log a user in
   router.route('/users/login')
-/**
+  /**
  * @swagger
  * paths:
  *   /api/v1/users/login:
  *     post:
  *       tags:
  *         - User
- *       summary: logs in a user
+ *       summary: Login a user
  *       operationId: login
- *       description: Logs in a user and provides them with a jwt token to access other routes
+ *       description: Logs in a user and provides them with a jwt token to access other routes.
  *       consumes:
  *         - application/x-www-form-urlencoded
  *       produces:
@@ -175,44 +228,49 @@ const UsersRoute = (router) => {
  *       parameters:
  *       - name: email
  *         in: formData
- *         description: The user's email address
+ *         description: user's email address
  *         required: true
  *         type: string
  *       - name: password
  *         in: formData
- *         description: The password for login in clear text
+ *         description: user's password
  *         required: true
  *         type: string
  *       responses:
  *         200:
- *           description: User logged in successfully
+ *           description: OK
+ *           examples:
+ *             application/json:
+ *               {
+ *                 token: "ewukjlvnfeoielfkmn94jdnkfkdjfkdkpojfkjfklsdkkdjksdklsdkfldfj"
+ *               }
  *           schema:
- *             type: string
- *           headers:
- *             Authorization:
- *               type: string
- *               format: int32
- *               description: stores user jwt token
+ *             $ref: '#/definitions/User'
  *         400:
- *           description: User not found
- *         401:
- *           description: Invalid password or username
+ *           description: Bad Request
+ *           examples:
+ *             application/json:
+ *               {
+ *                 message: "Password mismatch."
+ *               }
+ *           schema:
+ *             $ref: '#/definitions/User'
  */
+
     .post(UsersController.login);
 
   // find a user, update user details, delete user.
   router.route('/users/:id')
- /**
+  /**
  * @swagger
  * paths:
- *   api/v1//users/:id :
+ *   /api/v1/users/{id}:
  *     get:
  *       tags:
  *         - User
- *       summary: gets a user by id
+ *       summary: Fetch a user by id
  *       operationId: getAUser
- *       description: |
- *         This route is used to get a specific user.
+ *       description: This route is used to get a specific user.
  *       produces:
  *         - application/json
  *       parameters:
@@ -221,72 +279,128 @@ const UsersRoute = (router) => {
  *         description: token from login
  *         required: true
  *       - name: id
- *         in: query
- *         description: The id of the user to be retrieved
+ *         in: path
+ *         description: id of the user to be retrieved
  *         required: true
  *         type: integer
  *       responses:
  *         200:
- *           description: a user
+ *           description: OK
+ *           examples:
+ *             application/json:
+ *               {
+ *                 id: 9,
+ *                 name: "Temi Lajumoke",
+ *                 email: "temiboy@test.com",
+ *                 role: "admin"
+ *               }
  *           schema:
- *             type: object
- *             items:
- *               $ref: '#/definitions/User'
+ *             $ref: '#/definitions/User'
  *         400:
- *           description: bad input parameter
+ *           description: Bad request.
+ *           examples:
+ *             application/json:
+ *               {
+ *                 message: "Cannot find user."
+ *               }
+ *           schema:
+ *             $ref: '#/definitions/User'
+ *         500:
+ *           description: Internal Server Error
+ *           examples:
+ *             application/json:
+ *               {
+ *                 message: "Error. Please try again."
+ *               }
+ *           schema:
+ *             $ref: '#/definitions/User'
  *       security:
  *       - Authorization: [] 
  *     put:
  *       tags:
  *         - User
- *       summary: Updates user information
- *       description: This can only be done by the logged in user.
+ *       summary: Update user information
+ *       description: Update user information.
  *       operationId: updateUser
  *       produces:
- *         - application/xml
  *         - application/json
+ *       consumes:
+ *         - application/x-www-form-urlencoded
  *       parameters:
  *       - in: header
  *         name: Authorization
  *         description: token from login
  *         required: true
  *       - name: id
- *         in: query
- *         description: name that need to be updated
+ *         in: path
+ *         description: id of the user that needs to be updated
  *         required: true
  *         type: integer
  *       - in: formData
  *         name: fullName
- *         description: New name
+ *         description: new name
  *         required: false
  *       - in: formData
  *         name: email
- *         description: New email address
- *         required: false
+ *         description: new email if you want to update email, or current email if you don't want to.
+ *         required: true
  *       - in: formData
  *         name: password
- *         description: New password
+ *         description: new password
  *         required: false
  *       - in: formData
  *         name: roleType
- *         description: New role type (only for admin)
+ *         description: new role type (only for admin)
  *         required: false
  *       responses:
  *         200:
- *           description: ''
+ *           description: OK
+ *           examples:
+ *             application/json:
+ *               {
+ *                 user: {
+ *                    fullName: Baas Awesome Bank,
+ *                    email: baas@test.com,
+ *                    roleType: super user,
+ *                    userId: 3
+ *                  }
+ *               }
  *           schema:
- *             "$ref": "#/definitions/User"
- *         400:
- *           description: Invalid user supplied
+ *             $ref: '#/definitions/User'
  *         403:
- *           description: You dont have that kinda privilege
+ *           description: Forbidden.
+ *           examples:
+ *             application/json:
+ *               {
+ *                 message: "User id cannot be changed."
+ *               }
+ *           schema:
+ *             $ref: '#/definitions/User'
+ *         404:
+ *           description: Not Found.
+ *           examples:
+ *             application/json:
+ *               {
+ *                 message: "No such user."
+ *               }
+ *           schema:
+ *             $ref: '#/definitions/User'
+ *         500:
+ *           description: Internal Server Error
+ *           examples:
+ *             application/json:
+ *               {
+ *                 message: "Error. Please try again."
+ *               }
+ *           schema:
+ *             $ref: '#/definitions/User'
  *       security:
  *       - Authorization: []
  *     delete:
  *       tags:
  *         - User
- *       summary: Deletes user from system
- *       description: This can only be done by the logged in user.
+ *       summary: Delete a user
+ *       description: Delete a user.
  *       operationId: deleteUser
  *       produces:
  *         - application/json
@@ -296,34 +410,57 @@ const UsersRoute = (router) => {
  *         description: token from login
  *         required: true
  *       - name: id
- *         in: query
- *         description: Id of the user that needs to be deleted
+ *         in: path
+ *         description: id of the user that needs to be deleted
  *         required: true
  *         type: integer
  *       responses:
- *         203:
- *           description: User deleted
- *         403:
- *           description: You dont have that privilege
+ *         404:
+ *           description: Not Found
+ *           examples:
+ *             application/json:
+ *               {
+ *                 message: "User does not exist."
+ *               }
+ *           schema:
+ *             $ref: '#/definitions/User'
+ *         410:
+ *           description: Gone
+ *           examples:
+ *             application/json:
+ *               {
+ *                 message: "User deleted successfully."
+ *               }
+ *           schema:
+ *             $ref: '#/definitions/User'
+ *         400:
+ *           description: Internal Server Error.
+ *           examples:
+ *             application/json:
+ *               {
+ *                 message: "Error. Please try again."
+ *               }
+ *           schema:
+ *             $ref: '#/definitions/User'
  *       security:
  *       - Authorization: [] 
  */         
-    .get(Authenticate.verifyToken, UsersController.findAUser)
-    .put(Authenticate.verifyToken, UsersController.updateUser)
-    .delete(Authenticate.verifyToken, Authenticate.hasAdminAccess, UsersController.deleteAUser);
+    .get(Authenticate.verifyToken, UsersController.fetchUserById)
+    .put(Authenticate.verifyToken, UsersController.updateUserById)
+    .delete(Authenticate.verifyToken, Authenticate.hasAdminAccess, UsersController.deleteUserById);
 
   // search for users by name
   router.route('/search/users/')
-/** 
+  /** 
  * @swagger
  * paths:
- *   api/v1/search/users:
+ *   /api/v1/search/users/:
  *     get:
  *       tags:
  *         - User
- *       summary: Get user by user name
+ *       summary: Search user by name
  *       description: Find a user by the user's name
- *       operationId: getAllUsers
+ *       operationId: searchUsers
  *       produces:
  *         - application/json
  *       parameters:
@@ -331,36 +468,61 @@ const UsersRoute = (router) => {
  *         name: Authorization
  *         description: token from login
  *         required: true
- *       - name: search
+ *       - name: q
  *         in: query
- *         description: The name of the user that needs to be fetched.
+ *         description: the name of the user to search for
  *         required: true
  *         type: string
  *       responses:
  *         200:
- *           description: successful operation
+ *           description: OK
+ *           examples:
+ *             application/json:
+ *               {
+ *                  pagination: {
+ *                    totalCount: 1,
+ *                    currentPage: 1,
+ *                    pageCount: 1,
+ *                    pageSize: 1
+ *                },
+ *                  users: [
+ *                    {
+ *                      id: 1,
+ *                      fullName: "Baas Bank",
+ *                      email: "baas@test.com",
+ *                      roleType: "admin"
+ *                    }
+ *                  ]
+ *                }
  *           schema:
- *             "$ref": "#/definitions/User"
- *         400:
- *           description: Invalid username supplied
+ *             $ref: '#/definitions/User'
+ *         404:
+ *           description: Not Found.
+ *           examples:
+ *             application/json:
+ *               {
+ *                 message: "Search term does not match any user."
+ *               }
+ *           schema:
+ *             $ref: '#/definitions/User'
  *       security:
  *       - Authorization: [] 
  */
-    .get(Authenticate.verifyToken, Authenticate.hasAdminAccess, UsersController.searchUsers);
+
+    .get(Authenticate.verifyToken, Authenticate.hasAdminAccess, UsersController.searchForUsers);
 
   // search for users' document  
   router.route('/users/:id/documents')
-/**
+  /**
  * @swagger
  * paths:
- *   /api/v1/users/:id/documents :
+ *   /api/v1/users/{id}/documents/ :
  *     get:
  *       tags:
  *         - User
- *       summary: gets a user by id
- *       operationId: getAUser
- *       description: |
- *         This route is used to get a specific user.
+ *       summary: Get all documents belonging to a user
+ *       operationId: getAUserDocuments
+ *       description: used to get a specific user. **admin only**
  *       produces:
  *         - application/json
  *       parameters:
@@ -369,23 +531,59 @@ const UsersRoute = (router) => {
  *         description: token from login
  *         required: true
  *       - name: id
- *         in: query
- *         description: The id of the user whose documents is to be retrieved
+ *         in: path
+ *         description: id of the user whose documents is to be retrieved
  *         required: true
  *         type: integer
  *       responses:
  *         200:
- *           description: a user
+ *           description: OK
+ *           examples:
+ *             application/json:
+ *               {
+ *                  pagination: {
+ *                    totalCount: 1,
+ *                    currentPage: 1,
+ *                    pageCount: 1,
+ *                    pageSize: 1
+ *                },
+ *                  documents: [
+ *                  {
+ *                    id: 1,
+ *                    title: My first document,
+ *                    content: lorem ipsum and the rest of it,
+ *                    accessType: public,
+ *                    userId: 1
+ *                  }
+ *               ]
+ *             }
  *           schema:
- *             type: object
- *             items:
- *               $ref: '#/definitions/Document'
+ *             $ref: '#/definitions/Document' 
  *         400:
- *           description: bad input parameter
+ *           description: Bad Request
+ *           examples:
+ *             application/json:
+ *               {
+ *                 message: "Error. Please check the id and try again."
+ *               }
+ *         403:
+ *           description: Forbidden
+ *           examples:
+ *             application/json:
+ *               {
+ *                 message: "You cannot view another user documents."
+ *               }
+ *         404:
+ *           description: Not Found
+ *           examples:
+ *             application/json:
+ *               {
+ *                 message: "This user does not have any document."
+ *               }
  *       security:
  *       - Authorization: []
  */ 
-    .get(Authenticate.verifyToken, UsersController.getUserDocuments);
+    .get(Authenticate.verifyToken, UsersController.fetchAllDocumentsOfAUser);
 };
 
-export default UsersRoute;
+export default UsersRoutes;
