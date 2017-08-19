@@ -6,7 +6,7 @@ const expect = chai.expect;
 chai.use(http);
 
 describe('*: catch-all route', () => {
-  it('should return a specified message for any invalid route', (done) => {
+  it('should return a specified message for any route not defined in routes', (done) => {
     chai.request(app)
       .get('/api/v1/undefinedRoute')
       .end((err, res) => {

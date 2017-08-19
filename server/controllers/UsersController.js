@@ -64,7 +64,7 @@ class UsersController {
             message: 'signup successful',
             user: {
               id: user.id,
-              name: user.fullName,
+              fullName: user.fullName,
               email: user.email,
               roleType: user.roleType,
             }
@@ -205,17 +205,16 @@ class UsersController {
       .findById(req.params.id)
       .then((user) => {
         if (!user) {
-          return res.status(400).send({ message: 'Cannot find user.' });
+          return res.status(500).send({ message: 'Error. Please try again.' });
         }
         return res.status(200).send({
-          id: user.id,
-          name: user.fullName,
+          fullName: user.fullName,
           email: user.email,
           role: user.roleType,
         });
       })
       .catch(() => {
-        res.status(500).send({ message: 'Error. Please try again.' });
+        res.status(400).send({ message: 'Error. Please check the id and try again.' });
       });
   }
 
@@ -316,8 +315,8 @@ class UsersController {
       .findById(req.params.id)
       .then((user) => {
         if (!user) {
-          return res.status(404).json({
-            message: 'User does not exist',
+          return res.status(404).send({
+            message: 'Cannot find user.',
           });
         }
         user
@@ -327,7 +326,7 @@ class UsersController {
           }));
       })
       .catch(() => res.status(500).send(
-        'Error. Please try again',
+        'Error. Please try again.',
       ));
   }
 

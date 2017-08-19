@@ -108,7 +108,7 @@ class DocumentsController {
       Document
         .findAndCountAll(query)
         .then((documents) => {
-          const pagination = Helper.pagination(
+          const pagination = Helper.paginate(
             query.limit, query.offset, documents.count
           );
           res.status(200).send({
@@ -152,7 +152,7 @@ class DocumentsController {
           title: document.title,
           content: document.content,
           accessType: document.accessType,
-          ownerId: document.userId,
+          userId: document.userId,
         });
       })
       .catch(() => {
@@ -304,12 +304,7 @@ class DocumentsController {
               userId: document.userId
             }
           ))
-        })
-          .catch(() => {
-            return res.status(500).send({
-              message: 'Error. Please try again.'
-            });
-          });
+        });
       });
   }
 }

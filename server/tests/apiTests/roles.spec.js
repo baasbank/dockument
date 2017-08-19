@@ -32,7 +32,7 @@ describe('Roles', () => {
       chai.request(app)
         .post('/api/v1/roles/')
         .send({ roleType: 'super admin'})
-        .set({ 'Authorization': adminToken })
+        .set({ Authorization: adminToken })
         .end((err, res) => {
           expect(res.status).to.equal(201);
           expect(res.body).to.have.keys(['message', 'role']);
@@ -44,7 +44,7 @@ describe('Roles', () => {
       chai.request(app)
         .post('/api/v1/roles')
         .send({ roleType: 'admin' })
-        .set({ 'Authorization': adminToken })
+        .set({ Authorization: adminToken })
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body).to.have.keys(['message']);
@@ -56,7 +56,7 @@ describe('Roles', () => {
       chai.request(app)
         .post('/api/v1/roles')
         .send()
-        .set({ 'Authorization': adminToken })
+        .set({ Authorization: adminToken })
         .end((err, res) => {
           expect(res.status).to.equal(400);
           expect(res.body).to.have.keys(['message']);
