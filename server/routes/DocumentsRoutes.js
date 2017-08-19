@@ -7,11 +7,9 @@ import Authenticate from '../middleware/Authenticate';
  *   Document:
  *     type: object
  *     required:
- *     - id
  *     - title
- *     - body
- *     - authorId
- *     - access
+ *     - content
+ *     - accessType
  *     properties:
  *       id:
  *         type: integer
@@ -19,15 +17,15 @@ import Authenticate from '../middleware/Authenticate';
  *       title:
  *         type: string
  *         example:  Document one
- *       body:
+ *       content:
  *         type: string
  *         example: Lorem Ipsum
- *       authorId: 
- *         type: integer
- *         example: 1
- *       access:
+ *       accessType:
  *         type: string
  *         example: public
+ *       userId:
+ *         type: integer
+ *         example: 10
  *       createdAt:
  *         type: string
  *         format: int32
@@ -56,16 +54,16 @@ import Authenticate from '../middleware/Authenticate';
 const DocumentsRoute = (router) => {
   // Create a new user, and get all users
   router.route('/documents/')
-/**
+  /**
  * @swagger
  * paths: 
  *   /api/v1/documents/:
  *     get:
  *       tags:
  *         - Documents
- *       summary: Get all documents
+ *       summary: Fetch all documents
  *       description: Get all documents.
- *       operationId: getAllDocuments
+ *       operationId: fetchAllDocuments
  *       produces:
  *         - application/json
  *       parameters:
@@ -75,11 +73,11 @@ const DocumentsRoute = (router) => {
  *           required: true      
  *         - in: query
  *           name: limit
- *           description: Pagination limit
+ *           description: pagination limit
  *           required: false
  *         - in: query
  *           name: offset
- *           description: Pagination offset
+ *           description: pagination offset
  *           required: false
  *       responses:
  *         200:
@@ -89,27 +87,31 @@ const DocumentsRoute = (router) => {
  *               {
  *                 allDocuments: [
  *                   {
+ *                     id: 1,
  *                     title: "My first document",
  *                     content: "lorem ipsum and the rest of it",
- *                     access: "public",
+ *                     accessType: "public",
  *                     userId: 1
  *                   },
  *                   {
+ *                     id: 4,
  *                     title: "My second document",
  *                     content: "second lorem ipsum and the rest of it",
- *                     access: "private",
+ *                     accessType: "private",
  *                     userId: 2
  *                   }, 
  *                   {
+ *                     id: 8,
  *                     title: "My third document",
  *                     content: "third lorem ipsum and the rest of it",
- *                     access: "role",
+ *                     accessType: "role",
  *                     userId: 3
  *                   },
  *                   {
+ *                     id: 20,
  *                     title: "My fourth document",
  *                     content: "fourth lorem ipsum and the rest of it",
- *                     access: "public",
+ *                     accessType: "public",
  *                     userId: 2
  *                   }
  *      ]
@@ -130,7 +132,7 @@ const DocumentsRoute = (router) => {
  *           examples:
  *             application/json:
  *               {
- *                 message: "An error occurred."
+ *                 message: "Error. Please try again."
  *               }
  *           schema:
  *             $ref: "#/definitions/Document"
@@ -161,17 +163,17 @@ const DocumentsRoute = (router) => {
  *         required: true
  *       - in: formData
  *         name: accessType
- *         description: Who can access the document
+ *         description: who can access the document
  *         required: true
  *       responses:
  *         201:
- *           description: OK
+ *           description: Created
  *           examples:
  *             application/json:
  *               {
  *                 message: 'Document created.',
  *                  document: {
- *                    documentId: 4,
+ *                    id: 4,
  *                    title: Lovey Dovey,
  *                    content: I will conquer my opponent. Defeat will not be in my creed,
  *                    accessType: public,
@@ -186,6 +188,15 @@ const DocumentsRoute = (router) => {
  *             application/json:
  *               {
  *                 message: "Title field is required."
+ *               }
+ *           schema:
+ *             $ref: "#/definitions/Document"
+ *         500:
+ *           description: Internal Server Error
+ *           examples:
+ *             application/json:
+ *               {
+ *                 message: "Error. Please try again."
  *               }
  *           schema:
  *             $ref: "#/definitions/Document"
@@ -204,8 +215,8 @@ const DocumentsRoute = (router) => {
  *     get:
  *       tags:
  *         - Documents
- *       summary: Get a document by its id
- *       description: Get a document by id
+ *       summary: Fetch a document by id
+ *       description: Fetch a document by id
  *       operationId: getDocument
  *       produces:
  *         - application/json
@@ -216,7 +227,7 @@ const DocumentsRoute = (router) => {
  *           required: true 
  *         - name: id
  *           in: path
- *           description: The id of the document the user wants.
+ *           description: id of the document the user wants.
  *           required: true
  *           type: integer
  *       responses:
@@ -225,10 +236,10 @@ const DocumentsRoute = (router) => {
  *           examples:
  *             application/json:
  *               {
- *                 documentId: document.id,
+ *                 id: document.id,
  *                 title: document.title,
  *                 content: document.content,
- *                 access: document.accessType,
+ *                 accessType: document.accessType,
  *                 userId: document.userId 
  *               }
  *           schema:
@@ -300,11 +311,11 @@ const DocumentsRoute = (router) => {
  *           examples:
  *             application/json:
  *               {
- *                 id: updatedDocument.id,
- *                 title: updatedDocument.title,
- *                 content: updatedDocument.content,
- *                 accessType: updatedDocument.accessType,
- *                 userId: updatedDocument.userId
+ *                 id: 5,
+ *                 title: I'm way up,
+ *                 content: I feel blessed.,
+ *                 accessType: public,
+ *                 userId: 9
  *               }
  *           schema:
  *             $ref: "#/definitions/Document"
@@ -352,7 +363,7 @@ const DocumentsRoute = (router) => {
  *           required: true 
  *         - name: id
  *           in: path
- *           description: The id of the document that needs to be deleted.
+ *           description: id of the document that needs to be deleted.
  *           required: true
  *           type: integer
  *       responses:
@@ -458,7 +469,7 @@ const DocumentsRoute = (router) => {
  *             $ref: "#/definitions/Document"
  *        security:
  *        - Authorization: []
- */           
+ */                      
     .get(Authenticate.verifyToken, DocumentsController.searchDocuments);
 };
 
