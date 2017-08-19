@@ -40,6 +40,13 @@ class UsersController {
         message: 'password field is required.'
       });
     }
+    req.check('email', 'Please enter a valid email').isEmail();
+    const errors = req.validationErrors();
+    if (errors) {
+      return res.status(400).send({
+        errors
+      });
+    }
     User.findOne({ where: { email: req.body.email } })
       .then((existingUser) => {
         if (existingUser) {
@@ -90,6 +97,13 @@ class UsersController {
     if (!req.body.password) {
       return res.status(400).send({
         message: 'password field is required.'
+      });
+    }
+    req.check('email', 'Please enter a valid email').isEmail();
+    const errors = req.validationErrors();
+    if (errors) {
+      return res.status(400).send({
+        errors
       });
     }
     User.findOne({ where: { email: req.body.email } })
@@ -257,6 +271,13 @@ class UsersController {
               return res.status(403).send({
                 message:
                 'You can update only your profile.',
+              });
+            }
+            req.check('email', 'Please enter a valid email').isEmail();
+            const errors = req.validationErrors();
+            if (errors) {
+              return res.status(400).send({
+                errors
               });
             }
             user
