@@ -42,11 +42,11 @@ class DocumentsController {
       .then(document => res.status(201).send({
         message: 'Document created.',
         document: {
-          documentId: document.id,
+          id: document.id,
           title: document.title,
           content: document.content,
           accessType: document.accessType,
-          ownerId: document.userId
+          userId: document.userId
         }
       }));
   }
@@ -75,9 +75,10 @@ class DocumentsController {
               documents.map((document) => {
                 return (
                   {
+                    id: document.id,
                     title: document.title,
                     content: document.content,
-                    access: document.accessType,
+                    accessType: document.accessType,
                     userId: document.userId,
                   }
                 );
@@ -129,10 +130,10 @@ class DocumentsController {
             });
         }
         return res.status(200).send({
-          documentId: document.id,
+          id: document.id,
           title: document.title,
           content: document.content,
-          access: document.accessType,
+          accessType: document.accessType,
           ownerId: document.userId,
         });
       })
@@ -186,7 +187,7 @@ class DocumentsController {
           .update({
             title: req.body.title || document.title,
             content: req.body.content || document.content,
-            access: req.body.accessType || document.accessType,
+            accessType: req.body.accessType || document.accessType,
             userId: document.userId,
           })
           .then(updatedDocument => res.status(200).send({

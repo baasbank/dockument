@@ -410,8 +410,8 @@ class UsersController {
               id: document.id,
               title: document.title,
               content: document.content,
-              access: document.accessType,
-              OwnerId: document.userId,
+              accessType: document.accessType,
+              userId: document.userId,
               createdAt: document.createdAt,
               updatedAt: document.updatedAt,
             }));
