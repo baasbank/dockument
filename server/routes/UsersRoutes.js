@@ -82,7 +82,7 @@ import Authenticate from '../middleware/Authenticate';
  * @returns {void}
  */
 
-const UsersRoute = (router) => {
+const UsersRoutes = (router) => {
   // Create a new user, and get all users
   router.route('/users/')
   /**
@@ -468,7 +468,7 @@ const UsersRoute = (router) => {
  *         name: Authorization
  *         description: token from login
  *         required: true
- *       - name: search
+ *       - name: q
  *         in: query
  *         description: the name of the user to search for
  *         required: true
@@ -586,4 +586,4 @@ const UsersRoute = (router) => {
     .get(Authenticate.verifyToken, UsersController.fetchAllDocumentsOfAUser);
 };
 
-export default UsersRoute;
+export default UsersRoutes;

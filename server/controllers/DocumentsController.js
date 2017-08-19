@@ -48,7 +48,12 @@ class DocumentsController {
           accessType: document.accessType,
           userId: document.userId
         }
-      }));
+      }))
+      .catch(() => {
+        return res.status(500).send({
+          message: 'Error. Please try again.'
+        })
+      });
   }
 
   /**
@@ -109,6 +114,11 @@ class DocumentsController {
           res.status(200).send({
             pagination, documents: documents.rows,
           });
+        })
+        .catch(() => {
+          return res.status(500).send({
+            message: 'Error. Please try again.'
+          })
         });
     }
   }
@@ -294,7 +304,12 @@ class DocumentsController {
               userId: document.userId
             }
           ))
-        });
+        })
+          .catch(() => {
+            return res.status(500).send({
+              message: 'Error. Please try again.'
+            });
+          });
       });
   }
 }

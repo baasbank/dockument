@@ -40,7 +40,7 @@ import Authenticate from '../middleware/Authenticate';
  * @param {function} router
  * @returns {void}
  */
-const RolesRoute = (router) => {
+const RolesRoutes = (router) => {
   // Create a new role
   router.route('/roles')
 /** 
@@ -98,4 +98,4 @@ const RolesRoute = (router) => {
     .post(Authenticate.verifyToken, Authenticate.hasAdminAccess, RolesController.createRole);
 };
 
-export default RolesRoute;
+export default RolesRoutes;

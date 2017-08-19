@@ -51,8 +51,8 @@ import Authenticate from '../middleware/Authenticate';
  * @param {function} router
  * @returns {void}
  */
-const DocumentsRoute = (router) => {
-  // Create a new user, and get all users
+const DocumentsRoutes = (router) => {
+  // Create a new document, and get all documents
   router.route('/documents/')
   /**
  * @swagger
@@ -204,7 +204,7 @@ const DocumentsRoute = (router) => {
  *       - Authorization: []
  */ 
     .post(Authenticate.verifyToken, DocumentsController.createDocument)
-    .get(Authenticate.verifyToken, DocumentsController.getAllDocuments);
+    .get(Authenticate.verifyToken, DocumentsController.fetchAllDocuments);
 
   // get, update, and delete a document by its ID
   router.route('/documents/:id')
@@ -406,13 +406,13 @@ const DocumentsRoute = (router) => {
  *       security:
  *       - Authorization: []
  */ 
-    .get(Authenticate.verifyToken, DocumentsController.findADocument)
-    .put(Authenticate.verifyToken, DocumentsController.updateDocument)
-    .delete(Authenticate.verifyToken, DocumentsController.deleteADocument);
+    .get(Authenticate.verifyToken, DocumentsController.fetchDocumentById)
+    .put(Authenticate.verifyToken, DocumentsController.updateDocumentById)
+    .delete(Authenticate.verifyToken, DocumentsController.deleteDocumentById);
 
   // search for documents
   router.route('/search/documents')
-/** 
+  /** 
  * @swagger
  * paths:
  *   /api/v1/search/documents/:
@@ -473,4 +473,4 @@ const DocumentsRoute = (router) => {
     .get(Authenticate.verifyToken, DocumentsController.searchForDocuments);
 };
 
-export default DocumentsRoute;
+export default DocumentsRoutes;
