@@ -193,8 +193,7 @@ const DocumentsRoute = (router) => {
  *       - Authorization: []
  */ 
     .post(Authenticate.verifyToken, DocumentsController.createDocument)
-    .get(Authenticate.verifyToken, Authenticate.hasAdminAccess,
-      DocumentsController.getAllDocuments);
+    .get(Authenticate.verifyToken, DocumentsController.getAllDocuments);
 
   // get, update, and delete a document by its ID
   router.route('/documents/:id')

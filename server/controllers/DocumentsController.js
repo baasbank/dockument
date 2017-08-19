@@ -69,21 +69,29 @@ class DocumentsController {
               message: 'No documents found.'
             });
           }
-          res.status(200).send(
-            {
-              allDocuments:
-              documents.map((document) => {
-                return (
-                  {
-                    id: document.id,
-                    title: document.title,
-                    content: document.content,
-                    accessType: document.accessType,
-                    userId: document.userId,
-                  }
-                );
-              })
-            });
+          if (req.decoded.roleType === 'admin') {
+            return res.status(200).send(
+              {
+                allDocuments:
+                documents.map((document) => {
+                  return (
+                    {
+                      id: document.id,
+                      title: document.title,
+                      content: document.content,
+                      accessType: document.accessType,
+                      userId: document.userId,
+                    }
+                  );
+                })
+              });
+          }
+          return res.status(200).send({
+            allDocuments:
+            documents.filter((document) => {
+              return document.accessType === 'public';
+            })
+          });
         })
         .catch(() => res.status(500).send({
           message: 'Error. Please try again.',
@@ -95,7 +103,7 @@ class DocumentsController {
       Document
         .findAndCountAll(query)
         .then((documents) => {
-          const pagination = Helper.paginate(
+          const pagination = Helper.pagination(
             query.limit, query.offset, documents.count
           );
           res.status(200).send({
