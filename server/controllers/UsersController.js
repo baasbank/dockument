@@ -142,7 +142,7 @@ class UsersController {
    *@returns {object} json - payload
    * @memberOf UsersController
    */
-  static getAllUsers(req, res) {
+  static fetchAllUsers(req, res) {
     if ((!req.query.limit) && (!req.query.offset)) {
       User.findAll()
         .then((users) => {
@@ -200,7 +200,7 @@ class UsersController {
    *@returns {object} user - the user's details
    * @memberOf UsersController
    */
-  static findAUser(req, res) {
+  static fetchUserById(req, res) {
     return User
       .findById(req.params.id)
       .then((user) => {
@@ -228,7 +228,7 @@ class UsersController {
    * @returns {object} json - payload
    * @memberOf UsersController
    */
-  static updateUser(req, res) {
+  static updateUserById(req, res) {
     Role.findOne({ where: { roleType: req.decoded.roleType } })
       .then((role) => {
         User
@@ -311,7 +311,7 @@ class UsersController {
     * @returns {object} message - delete message
     * @memberOf UsersController
     */
-  static deleteAUser(req, res) {
+  static deleteUserById(req, res) {
     User
       .findById(req.params.id)
       .then((user) => {
@@ -340,7 +340,7 @@ class UsersController {
    * @returns {object} json- payload
    * @memberOf UsersController
    */
-  static searchUsers(req, res) {
+  static searchForUsers(req, res) {
     const searchTerm = req.query.q.trim();
 
     const query = {
@@ -393,7 +393,7 @@ class UsersController {
    * @returns {object} json - payload
    * @memberOf UsersController
    */
-  static getUserDocuments(req, res) {
+  static fetchAllDocumentsOfAUser(req, res) {
     if ((parseInt(req.params.id, 10) === req.decoded.userId) || (req.decoded.roleType === 'admin')) {
       const query = {
         where: {

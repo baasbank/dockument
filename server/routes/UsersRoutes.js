@@ -206,7 +206,7 @@ const UsersRoute = (router) => {
  *             $ref: '#/definitions/User'
  */
 
-    .get(Authenticate.verifyToken, Authenticate.hasAdminAccess, UsersController.getAllUsers)
+    .get(Authenticate.verifyToken, Authenticate.hasAdminAccess, UsersController.fetchAllUsers)
     .post(UsersController.createUser);
 
   // Log a user in
@@ -445,9 +445,9 @@ const UsersRoute = (router) => {
  *       security:
  *       - Authorization: [] 
  */         
-    .get(Authenticate.verifyToken, UsersController.findAUser)
-    .put(Authenticate.verifyToken, UsersController.updateUser)
-    .delete(Authenticate.verifyToken, Authenticate.hasAdminAccess, UsersController.deleteAUser);
+    .get(Authenticate.verifyToken, UsersController.fetchUserById)
+    .put(Authenticate.verifyToken, UsersController.updateUserById)
+    .delete(Authenticate.verifyToken, Authenticate.hasAdminAccess, UsersController.deleteUserById);
 
   // search for users by name
   router.route('/search/users/')
@@ -509,7 +509,7 @@ const UsersRoute = (router) => {
  *       - Authorization: [] 
  */
 
-    .get(Authenticate.verifyToken, Authenticate.hasAdminAccess, UsersController.searchUsers);
+    .get(Authenticate.verifyToken, Authenticate.hasAdminAccess, UsersController.searchForUsers);
 
   // search for users' document  
   router.route('/users/:id/documents')
@@ -583,7 +583,7 @@ const UsersRoute = (router) => {
  *       security:
  *       - Authorization: []
  */ 
-    .get(Authenticate.verifyToken, UsersController.getUserDocuments);
+    .get(Authenticate.verifyToken, UsersController.fetchAllDocumentsOfAUser);
 };
 
 export default UsersRoute;

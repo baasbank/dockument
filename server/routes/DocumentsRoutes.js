@@ -470,7 +470,7 @@ const DocumentsRoute = (router) => {
  *        security:
  *        - Authorization: []
  */                      
-    .get(Authenticate.verifyToken, DocumentsController.searchDocuments);
+    .get(Authenticate.verifyToken, DocumentsController.searchForDocuments);
 };
 
 export default DocumentsRoute;

@@ -60,7 +60,7 @@ class DocumentsController {
    *@returns {object} json - payload
    * @memberOf DocumentsController
    */
-  static getAllDocuments(req, res) {
+  static fetchAllDocuments(req, res) {
     if ((!req.query.limit) && (!req.query.offset)) {
       Document.findAll()
         .then((documents) => {
@@ -121,7 +121,7 @@ class DocumentsController {
    *@returns {object} json - payload
    * @memberOf DocumentsController
    */
-  static findADocument(req, res) {
+  static fetchDocumentById(req, res) {
     return Document
       .findById(req.params.id)
       .then((document) => {
@@ -158,7 +158,7 @@ class DocumentsController {
    * @returns {object} json - payload
    * @memberOf DocumentsController
    */
-  static updateDocument(req, res) {
+  static updateDocumentById(req, res) {
     Document
       .findById(req.params.id)
       .then((document) => {
@@ -225,7 +225,7 @@ class DocumentsController {
     * @returns {object} json - payload
     * @memberOf DocumentsController
     */
-  static deleteADocument(req, res) {
+  static deleteDocumentById(req, res) {
     Document
       .findById(req.params.id)
       .then((document) => {
@@ -259,7 +259,7 @@ class DocumentsController {
    * @returns {object} json - payload
    * @memberOf DocumentsController
    */
-  static searchDocuments(req, res) {
+  static searchForDocuments(req, res) {
     const searchTerm = req.query.q.trim();
 
     const query = {
