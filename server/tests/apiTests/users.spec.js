@@ -88,7 +88,7 @@ describe('Users', () => {
         .post('/api/v1/users/login')
         .send(userPasswordMismatch)
         .end((err, res) => {
-          expect(res.status).to.equal(400);
+          expect(res.status).to.equal(401);
           expect(res.body).to.have.keys(['message']);
           expect(res.body.message).to.eql('Password mismatch.');
           done();
@@ -149,11 +149,11 @@ describe('Users', () => {
         .set({ Authorization: adminToken })
         .end((err, res) => {
           expect(res.status).to.equal(200);
-          expect(Array.isArray(res.body.allUsers));
-          expect(res.body.allUsers[0].fullName).to.eql('Baas Bank');
-          expect(res.body.allUsers[0].email).to.eql('baas@test.com');
-          expect(res.body.allUsers[1].email).to.eql('john@test.com');
-          expect(res.body.allUsers[1].roleType).to.eql('super user');
+          expect(Array.isArray(res.body.users));
+          expect(res.body.users[0].fullName).to.eql('Baas Bank');
+          expect(res.body.users[0].email).to.eql('baas@test.com');
+          expect(res.body.users[1].email).to.eql('john@test.com');
+          expect(res.body.users[1].roleType).to.eql('super user');
           done();
         });
     });
@@ -175,14 +175,14 @@ describe('Users', () => {
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(Array.isArray(res.body.users));
-          expect(res.body).to.have.keys(['pagination', 'allUsers']);
+          expect(res.body).to.have.keys(['pagination', 'users']);
           expect(res.body.pagination).to.have.keys(['totalCount', 'pageSize', 'currentPage', 'pageCount']);
           expect(res.body.pagination.totalCount).to.equal(4);
           expect(res.body.pagination.pageSize).to.equal(2);
-          expect(res.body.allUsers[0].fullName).to.eql('Baas Bank');
-          expect(res.body.allUsers[0].roleType).to.eql('admin');
-          expect(res.body.allUsers[1].id).to.equal(2);
-          expect(res.body.allUsers[1].email).to.eql('john@test.com');
+          expect(res.body.users[0].fullName).to.eql('Baas Bank');
+          expect(res.body.users[0].roleType).to.eql('admin');
+          expect(res.body.users[1].id).to.equal(2);
+          expect(res.body.users[1].email).to.eql('john@test.com');
           done();
         });
     });
@@ -194,10 +194,9 @@ describe('Users', () => {
         .set({ Authorization: regularUserToken })
         .end((err, res) => {
           expect(res.status).to.equal(200);
-          expect(res.body).to.have.keys(['fullName', 'email', 'role']);
+          expect(res.body).to.have.keys(['fullName', 'roleType']);
           expect(res.body.fullName).to.eql('Baas Bank');
-          expect(res.body.email).to.eql('baas@test.com');
-          expect(res.body.role).to.eql('admin');
+          expect(res.body.roleType).to.eql('admin');
           done();
         });
     });

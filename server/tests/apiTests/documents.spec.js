@@ -107,10 +107,10 @@ describe('Documents', () => {
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(Array.isArray(res.body.allDocuments));
-          expect(res.body.allDocuments[0].title).to.eql('My first document');
-          expect(res.body.allDocuments[1].content).to.eql('second lorem ipsum and the rest of it');
-          expect(res.body.allDocuments[2].accessType).to.eql('role');
-          expect(res.body.allDocuments[3].userId).to.equal(2);
+          expect(res.body.documents[0].title).to.eql('My first document');
+          expect(res.body.documents[1].content).to.eql('second lorem ipsum and the rest of it');
+          expect(res.body.documents[2].accessType).to.eql('role');
+          expect(res.body.documents[3].userId).to.equal(2);
           done();
         });
     });
