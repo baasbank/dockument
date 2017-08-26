@@ -153,7 +153,7 @@ class UsersController {
           }
           return res.status(200).send(
             {
-              allUsers:
+              users:
               users.map(user => (
                 {
                   id: user.id,
@@ -179,7 +179,7 @@ class UsersController {
           );
           return res.status(200).send({
             pagination,
-            allUsers: users.rows.map(user => (
+            users: users.rows.map(user => (
               {
                 id: user.id,
                 fullName: user.fullName,
