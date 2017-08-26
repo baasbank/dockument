@@ -44,7 +44,7 @@ class UsersController {
     const errors = req.validationErrors();
     if (errors) {
       return res.status(400).send({
-        errors
+        message: errors[0].msg
       });
     }
     User.findOne({ where: { email: req.body.email } })
@@ -103,7 +103,7 @@ class UsersController {
     const errors = req.validationErrors();
     if (errors) {
       return res.status(400).send({
-        errors
+        message: errors[0].msg
       });
     }
     User.findOne({ where: { email: req.body.email } })
@@ -276,7 +276,7 @@ class UsersController {
             const errors = req.validationErrors();
             if (errors) {
               return res.status(400).send({
-                errors
+                message: errors[0].msg
               });
             }
             user
