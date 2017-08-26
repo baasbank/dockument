@@ -293,17 +293,26 @@ class DocumentsController {
             message: 'Search term does not match any document',
           });
         }
-        res.status(200).send({
+        if (req.decoded.roleType === 'admin') {
+          return res.status(200).send({
+            pagination,
+            documents: documents.rows.map(document => (
+              {
+                id: document.id,
+                title: document.title,
+                content: document.content,
+                accessType: document.accessType,
+                userId: document.userId
+              }
+            ))
+          });
+        }
+        return res.status(200).send({
           pagination,
-          documents: documents.rows.map(document => (
-            {
-              id: document.id,
-              title: document.title,
-              content: document.content,
-              accessType: document.accessType,
-              userId: document.userId
-            }
-          ))
+          documents:
+          documents.rows.filter((document) => {
+            return document.accessType === 'public';
+          })
         });
       });
   }
