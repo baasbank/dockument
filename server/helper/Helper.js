@@ -32,6 +32,20 @@ class Helper {
     }
     return result;
   }
+
+  /**
+   * @static
+   * @param {string} accessType - document access type
+   * @returns {boolean} - 
+   * @memberOf ControllerHelper
+   */
+  static checkAccessType(accessType) {
+    if ((accessType === 'public') || (accessType === 'private') || (accessType === 'role')) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 }
 
 export default Helper;

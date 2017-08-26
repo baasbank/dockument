@@ -32,28 +32,31 @@ class DocumentsController {
         message: 'accessType field is required.'
       });
     }
-    Document
-      .create({
-        title: req.body.title,
-        content: req.body.content,
-        accessType: req.body.accessType,
-        userId: req.decoded.userId,
-      })
-      .then(document => res.status(201).send({
-        message: 'Document created.',
-        document: {
-          id: document.id,
-          title: document.title,
-          content: document.content,
-          accessType: document.accessType,
-          userId: document.userId
-        }
-      }))
-      .catch(() => {
-        return res.status(500).send({
-          message: 'Error. Please try again.'
+    const checkAccessType = Helper.checkAccessType(req.body.accessType);
+    if (checkAccessType === true) {
+      Document
+        .create({
+          title: req.body.title,
+          content: req.body.content,
+          accessType: req.body.accessType,
+          userId: req.decoded.userId,
+        })
+        .then(document => res.status(201).send({
+          message: 'Document created.',
+          document: {
+            id: document.id,
+            title: document.title,
+            content: document.content,
+            accessType: document.accessType,
+            userId: document.userId
+          }
+        }))
+        .catch(() => {
+          return res.status(500).send({
+            message: 'Error. Please try again.'
+          });
         });
-      });
+    }
   }
 
   /**
