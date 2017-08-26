@@ -111,8 +111,17 @@ class DocumentsController {
           const pagination = Helper.paginate(
             query.limit, query.offset, documents.count
           );
-          res.status(200).send({
-            pagination, documents: documents.rows,
+          if (req.decoded.roleType === 'admin') {
+            return res.status(200).send({
+              pagination, documents: documents.rows,
+            });
+          }
+          return res.status(200).send({
+            pagination,
+            documents:
+            documents.rows.filter((document) => {
+              return document.accessType === 'public';
+            })
           });
         })
         .catch(() => {
