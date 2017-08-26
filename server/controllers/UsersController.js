@@ -127,7 +127,7 @@ class UsersController {
             token
           });
         } else {
-          res.status(400)
+          res.status(401)
             .send({ message: 'Password mismatch.' });
         }
       })
