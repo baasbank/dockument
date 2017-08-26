@@ -52,7 +52,7 @@ class DocumentsController {
       .catch(() => {
         return res.status(500).send({
           message: 'Error. Please try again.'
-        })
+        });
       });
   }
 
@@ -77,7 +77,7 @@ class DocumentsController {
           if (req.decoded.roleType === 'admin') {
             return res.status(200).send(
               {
-                allDocuments:
+                documents:
                 documents.map((document) => {
                   return (
                     {
@@ -92,7 +92,7 @@ class DocumentsController {
               });
           }
           return res.status(200).send({
-            allDocuments:
+            documents:
             documents.filter((document) => {
               return document.accessType === 'public';
             })
@@ -118,7 +118,7 @@ class DocumentsController {
         .catch(() => {
           return res.status(500).send({
             message: 'Error. Please try again.'
-          })
+          });
         });
     }
   }
