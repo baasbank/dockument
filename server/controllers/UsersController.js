@@ -209,8 +209,7 @@ class UsersController {
         }
         return res.status(200).send({
           fullName: user.fullName,
-          email: user.email,
-          role: user.roleType,
+          roleType: user.roleType,
         });
       })
       .catch(() => {
