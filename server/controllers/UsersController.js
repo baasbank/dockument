@@ -25,28 +25,12 @@ class UsersController {
      * @memberOf UsersController
      */
   static createUser(req, res) {
-    if (!req.body.fullName) {
-      return res.status(400).send({
-        message: 'fullName field is required.'
-      });
-    }
-    if (!req.body.email) {
-      return res.status(400).send({
-        message: 'email field is required.'
-      });
-    }
-    if (!req.body.password) {
-      return res.status(400).send({
-        message: 'password field is required.'
-      });
-    }
-    req.check('email', 'Please enter a valid email').isEmail();
-    const errors = req.validationErrors();
-    if (errors) {
-      return res.status(400).send({
-        message: errors[0].msg
-      });
-    }
+    req.checkBody('fullName', 'fullName field is required.').notEmpty();
+    req.checkBody('email', 'email field is required.').notEmpty();
+    req.checkBody('email', 'Please enter a valid email.').isEmail();
+    req.checkBody('password', 'password field is required.').notEmpty();
+    Helper.validateErrors(req, res);
+
     User.findOne({ where: { email: req.body.email } })
       .then((existingUser) => {
         if (existingUser) {
@@ -89,23 +73,11 @@ class UsersController {
    * @memberOf UsersController
    */
   static login(req, res) {
-    if (!req.body.email) {
-      return res.status(400).send({
-        message: 'email field is required.'
-      });
-    }
-    if (!req.body.password) {
-      return res.status(400).send({
-        message: 'password field is required.'
-      });
-    }
-    req.check('email', 'Please enter a valid email').isEmail();
-    const errors = req.validationErrors();
-    if (errors) {
-      return res.status(400).send({
-        message: errors[0].msg
-      });
-    }
+    req.checkBody('email', 'email field is required.').notEmpty();
+    req.checkBody('password', 'password field is required.').notEmpty();
+    req.checkBody('email', 'Please enter a valid email.').isEmail();
+    Helper.validateErrors(req, res);
+
     User.findOne({ where: { email: req.body.email } })
       .then((user) => {
         if (!user) {
@@ -201,12 +173,12 @@ class UsersController {
    * @memberOf UsersController
    */
   static fetchUserById(req, res) {
+    req.checkParams('id', 'Please input a valid id.').isInt();
+    Helper.validateErrors(req, res);
     return User
       .findById(req.params.id)
       .then((user) => {
-        if (!user) {
-          return res.status(500).send({ message: 'Error. Please try again.' });
-        }
+        Helper.userExists(user, res);
         return res.status(200).send({
           fullName: user.fullName,
           roleType: user.roleType,
@@ -227,16 +199,14 @@ class UsersController {
    * @memberOf UsersController
    */
   static updateUserById(req, res) {
+    req.checkParams('id', 'Please input a valid id.').isInt();
+    Helper.validateErrors(req, res);
     Role.findOne({ where: { roleType: req.decoded.roleType } })
       .then((role) => {
         User
           .findById(req.params.id)
           .then((user) => {
-            if (!user) {
-              return res.status(404).send({
-                message: 'No such user.',
-              });
-            }
+            Helper.userExists(user, res);
             if (req.body.id) {
               return res.status(403).send({
                 message:
@@ -271,20 +241,12 @@ class UsersController {
                 'You can update only your profile.',
               });
             }
-            req.check('email', 'Please enter a valid email').isEmail();
-            const errors = req.validationErrors();
-            if (errors) {
-              return res.status(400).send({
-                message: errors[0].msg
-              });
+            if (req.body.email) {
+              req.checkBody('email', 'Please enter a valid email').isEmail();
+              Helper.validateErrors(req, res);
             }
             user
-              .update({
-                fullName: req.body.fullName || user.fullName,
-                email: req.body.email || user.email,
-                password: req.body.password || user.password,
-                roleType: req.body.roleType || user.roleType,
-              })
+              .update(req.body)
               .then(updatedUser => res.status(200).send({
                 message: 'Update Successful!',
                 user: {
@@ -310,14 +272,12 @@ class UsersController {
     * @memberOf UsersController
     */
   static deleteUserById(req, res) {
+    req.checkParams('id', 'Please input a valid id.').isInt();
+    Helper.validateErrors(req, res);
     User
       .findById(req.params.id)
       .then((user) => {
-        if (!user) {
-          return res.status(404).send({
-            message: 'Cannot find user.',
-          });
-        }
+        Helper.userExists(user, res);
         user
           .destroy()
           .then(() => res.status(200).send({
@@ -392,6 +352,8 @@ class UsersController {
    * @memberOf UsersController
    */
   static fetchAllDocumentsOfAUser(req, res) {
+    req.checkParams('id', 'Please input a valid id.').isInt();
+    Helper.validateErrors(req, res);
     if ((parseInt(req.params.id, 10) === req.decoded.userId) || (req.decoded.roleType === 'admin')) {
       const query = {
         where: {

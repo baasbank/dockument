@@ -17,22 +17,12 @@ class DocumentsController {
    * @memberOf DocumentsController
    */
   static createDocument(req, res) {
-    if (!req.body.title) {
-      return res.status(400).send({
-        message: 'Title field is required.'
-      });
-    }
-    if (!req.body.content) {
-      return res.status(400).send({
-        message: 'Content field is required.'
-      });
-    }
-    if (!req.body.accessType) {
-      return res.status(400).send({
-        message: 'accessType field is required.'
-      });
-    }
+    req.checkBody('title', 'Title field is required.').notEmpty();
+    req.checkBody('content', 'Content field is required.').notEmpty();
+    req.checkBody('accessType', 'accessType field is required.').notEmpty();
+    Helper.validateErrors(req, res);
     const checkAccessType = Helper.checkAccessType(req.body.accessType);
+
     if (checkAccessType === true) {
       Document
         .create({
@@ -144,14 +134,12 @@ class DocumentsController {
    * @memberOf DocumentsController
    */
   static fetchDocumentById(req, res) {
+    req.checkParams('id', 'Please input a valid id.').isInt();
+    Helper.validateErrors(req, res);
     return Document
       .findById(req.params.id)
       .then((document) => {
-        if (!document) {
-          return res.status(404).send({
-            message: 'Document does not exist.'
-          });
-        }
+        Helper.documentExists(document, res);
         if ((req.decoded.roleType !== 'admin') && (document.accessType === 'private') &&
           (document.userId !== req.decoded.userId)) {
           return res.status(403)
@@ -181,14 +169,12 @@ class DocumentsController {
    * @memberOf DocumentsController
    */
   static updateDocumentById(req, res) {
+    req.checkParams('id', 'Please input a valid id.').isInt();
+    Helper.validateErrors(req, res);
     Document
       .findById(req.params.id)
       .then((document) => {
-        if (!document) {
-          return res.status(404).send({
-            message: 'Document does not exist.',
-          });
-        }
+        Helper.documentExists(document, res);
         if (req.decoded.userId !== document.userId) {
           return res.status(403).send({
             message: 'You can update only your documents.'
@@ -213,26 +199,28 @@ class DocumentsController {
             'updatedAt date cannot be changed.',
           });
         }
-        document
-          .update({
-            title: req.body.title || document.title,
-            content: req.body.content || document.content,
-            accessType: req.body.accessType || document.accessType,
-            userId: document.userId,
-          })
-          .then(updatedDocument => res.status(200).send({
-            message: 'Update Successful!',
-            document: {
-              id: updatedDocument.id,
-              title: updatedDocument.title,
-              content: updatedDocument.content,
-              accessType: updatedDocument.accessType,
-              userId: updatedDocument.userId
-            }
-          }))
-          .catch(() => res.status(500).send({
-            message: 'Error. Please try again.',
-          }));
+        const checkAccessType = Helper.checkAccessType(req.body.accessType);
+        if (checkAccessType === true) {
+          document
+            .update({
+              title: req.body.title || document.title,
+              content: req.body.content || document.content,
+              accessType: req.body.accessType || document.accessType,
+            })
+            .then(updatedDocument => res.status(200).send({
+              message: 'Update Successful!',
+              document: {
+                id: updatedDocument.id,
+                title: updatedDocument.title,
+                content: updatedDocument.content,
+                accessType: updatedDocument.accessType,
+                userId: updatedDocument.userId
+              }
+            }))
+            .catch(() => res.status(500).send({
+              message: 'Error. Please try again.',
+            }));
+        }
       })
       .catch(() => res.status(500).send({
         message: 'Error. Please try again.',
@@ -248,14 +236,12 @@ class DocumentsController {
     * @memberOf DocumentsController
     */
   static deleteDocumentById(req, res) {
+    req.checkParams('id', 'Please input a valid id.').isInt();
+    Helper.validateErrors(req, res);
     Document
       .findById(req.params.id)
       .then((document) => {
-        if (!document) {
-          return res.status(404).send({
-            message: 'Document does not exist.',
-          });
-        }
+        Helper.documentExists(document, res);
 
         if (req.decoded.userId !== document.userId) {
           return res.status(403).send({
