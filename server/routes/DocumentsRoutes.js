@@ -51,7 +51,7 @@ import Authenticate from '../middleware/Authenticate';
  * @param {function} router
  * @returns {void}
  */
-const DocumentsRoutes = (router) => {
+const documentsRoutes = (router) => {
   // Create a new document, and get all documents
   router.route('/documents/')
   /**
@@ -473,4 +473,4 @@ const DocumentsRoutes = (router) => {
     .get(Authenticate.verifyToken, DocumentsController.searchForDocuments);
 };
 
-export default DocumentsRoutes;
+export default documentsRoutes;
