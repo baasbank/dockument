@@ -119,7 +119,7 @@ const usersRoutes = (router) => {
  *           examples:
  *             application/json:
  *               {
- *                 allUsers: [
+ *                 users: [
  *                   {
  *                   id: 1,
  *                   fullName: "Esther Falayi",
