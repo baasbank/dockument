@@ -37,7 +37,7 @@ class Helper {
    * @static
    * @param {string} accessType - document access type
    * @returns {boolean} - 
-   * @memberOf ControllerHelper
+   * @memberOf Helper
    */
   static checkAccessType(accessType) {
     if ((accessType === 'public') || (accessType === 'private') || (accessType === 'role')) {
