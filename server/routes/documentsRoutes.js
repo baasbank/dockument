@@ -85,7 +85,7 @@ const documentsRoutes = (router) => {
  *           examples:
  *             application/json:
  *               {
- *                 allDocuments: [
+ *                 documents: [
  *                   {
  *                     id: 1,
  *                     title: "My first document",
