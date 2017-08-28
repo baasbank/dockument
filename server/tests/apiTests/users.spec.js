@@ -79,7 +79,7 @@ describe('Users', () => {
         .end((err, res) => {
           expect(res.status).to.equal(400);
           expect(res.body).to.have.keys(['message']);
-          expect(res.body.message).to.eql('email field is required.');
+          expect(res.body.message[0]).to.eql('email field is required.');
           done();
         });
     });
@@ -114,7 +114,7 @@ describe('Users', () => {
         .end((err, res) => {
           expect(res.status).to.equal(400);
           expect(res.body).to.have.keys(['message']);
-          expect(res.body.message).to.eql('email field is required.');
+          expect(res.body.message[0]).to.eql('email field is required.');
           done();
         });
     });
@@ -206,7 +206,7 @@ describe('Users', () => {
         .set({ Authorization: adminToken })
         .end((err, res) => {
           expect(res.status).to.equal(400);
-          expect(res.body.message).to.eql('Error. Please check the id and try again.');
+          expect(res.body.message).to.eql('Please input a valid id.');
           done();
         });
     });
@@ -283,7 +283,7 @@ describe('Users', () => {
         .set({ Authorization: adminToken })
         .end((err, res) => {
           expect(res.status).to.equal(404);
-          expect(res.body.message).to.eql('Cannot find user.');
+          expect(res.body.message).to.eql('User does not exist.');
           done();
         });
     });
