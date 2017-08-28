@@ -1,6 +1,6 @@
-import rolesRoutes from './RolesRoutes';
-import usersRoutes from './UsersRoutes';
-import documentsRoutes from './DocumentsRoutes';
+import rolesRoutes from './rolesRoutes';
+import usersRoutes from './usersRoutes';
+import documentsRoutes from './documentsRoutes';
 
 /**
  * Combine roles, documents and users routes
