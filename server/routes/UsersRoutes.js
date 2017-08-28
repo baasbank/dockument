@@ -82,7 +82,7 @@ import Authenticate from '../middleware/Authenticate';
  * @returns {void}
  */
 
-const UsersRoutes = (router) => {
+const usersRoutes = (router) => {
   // Create a new user, and get all users
   router.route('/users/')
   /**
@@ -586,4 +586,4 @@ const UsersRoutes = (router) => {
     .get(Authenticate.verifyToken, UsersController.fetchAllDocumentsOfAUser);
 };
 
-export default UsersRoutes;
+export default usersRoutes;

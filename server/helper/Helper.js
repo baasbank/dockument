@@ -32,6 +32,72 @@ class Helper {
     }
     return result;
   }
+
+  /**
+   * @static
+   * @param {string} accessType - document access type
+   * @returns {boolean} - 
+   * @memberOf Helper
+   */
+  static checkAccessType(accessType) {
+    if ((accessType === 'public') || (accessType === 'private') || (accessType === 'role')) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   * @static
+   * @param {object} document - document details
+   * @param {object} res - response
+   * @returns {object} message - 
+   * @memberOf Helper
+   */
+  static documentExists(document, res) {
+    if (!document) {
+      return res.status(404).send({
+        message: 'Document does not exist.'
+      });
+    }
+  }
+
+  /**
+   * @static
+   * @param {object} user - user details
+   * @param {object} res - response
+   * @returns {object} message - 
+   * @memberOf Helper
+   */
+  static userExists(user, res) {
+    if (!user) {
+      return res.status(404).send({
+        message: 'User does not exist.'
+      });
+    }
+  }
+
+  /**
+   * @static
+   * @param {object} req - request
+   * @param {object} res - response
+   * @returns {object} message - 
+   * @memberOf Helper
+   */
+  static validateErrors(req, res) {
+    const errors = req.validationErrors();
+    if (errors) {
+      const errorObject = errors.map(error => error.msg);
+      if (errorObject.length === 1) {
+        return res.status(400).send({
+          message: errorObject[0],
+        });
+      }
+      return res.status(400).send({
+        message: errorObject,
+      });
+    }
+  }
 }
 
 export default Helper;
