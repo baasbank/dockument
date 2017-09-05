@@ -95,11 +95,11 @@ class UsersController {
           const token = jwt.sign(userData, secret, {
             expiresIn: '48h'
           });
-          res.status(200).json({
+          return res.status(200).json({
             token
           });
         } else {
-          res.status(401)
+          return res.status(401)
             .send({ message: 'Password mismatch.' });
         }
       })
@@ -175,10 +175,18 @@ class UsersController {
   static fetchUserById(req, res) {
     req.checkParams('id', 'Please input a valid id.').isInt();
     Helper.validateErrors(req, res);
-    return User
+    User
       .findById(req.params.id)
       .then((user) => {
         Helper.userExists(user, res);
+        if (req.decoded.userId === parseInt(req.params.id, 10)) {
+          return res.status(200).send({
+            id: user.id,
+            fullName: user.fullName,
+            email: user.email,
+            roleType: user.roleType
+          });
+        }
         return res.status(200).send({
           fullName: user.fullName,
           roleType: user.roleType,
