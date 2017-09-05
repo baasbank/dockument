@@ -8,3 +8,4 @@ coverage
 public/.DS_Store
 dist
 public
+.coveralls.yml

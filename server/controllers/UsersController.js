@@ -30,11 +30,16 @@ class UsersController {
     req.checkBody('email', 'Please enter a valid email.').isEmail();
     req.checkBody('password', 'password field is required.').notEmpty();
     Helper.validateErrors(req, res);
+    if (typeof req.body.fullName !== 'string') {
+      return res.status(400).send({
+        message: 'fullName cannot be a number.'
+      });
+    }
 
     User.findOne({ where: { email: req.body.email } })
       .then((existingUser) => {
         if (existingUser) {
-          return res.status(400).send({
+          return res.status(409).send({
             message: 'User already exists!',
           });
         }
@@ -77,6 +82,11 @@ class UsersController {
     req.checkBody('password', 'password field is required.').notEmpty();
     req.checkBody('email', 'Please enter a valid email.').isEmail();
     Helper.validateErrors(req, res);
+    if (typeof req.body.password !== 'string') {
+      return res.status(400).send({
+        message: 'password should be a string of letters and/or numbers.'
+      });
+    }
 
     User.findOne({ where: { email: req.body.email } })
       .then((user) => {
@@ -95,11 +105,11 @@ class UsersController {
           const token = jwt.sign(userData, secret, {
             expiresIn: '48h'
           });
-          res.status(200).json({
+          return res.status(200).json({
             token
           });
         } else {
-          res.status(401)
+          return res.status(401)
             .send({ message: 'Password mismatch.' });
         }
       })
@@ -175,10 +185,18 @@ class UsersController {
   static fetchUserById(req, res) {
     req.checkParams('id', 'Please input a valid id.').isInt();
     Helper.validateErrors(req, res);
-    return User
+    User
       .findById(req.params.id)
       .then((user) => {
         Helper.userExists(user, res);
+        if (req.decoded.userId === parseInt(req.params.id, 10)) {
+          return res.status(200).send({
+            id: user.id,
+            fullName: user.fullName,
+            email: user.email,
+            roleType: user.roleType
+          });
+        }
         return res.status(200).send({
           fullName: user.fullName,
           roleType: user.roleType,

@@ -106,7 +106,7 @@ describe('Documents', () => {
         .set({ Authorization: adminToken })
         .end((err, res) => {
           expect(res.status).to.equal(200);
-          expect(Array.isArray(res.body.allDocuments));
+          expect(Array.isArray(res.body.documents));
           expect(res.body.documents[0].title).to.eql('My first document');
           expect(res.body.documents[1].content).to.eql('second lorem ipsum and the rest of it');
           expect(res.body.documents[2].accessType).to.eql('role');
