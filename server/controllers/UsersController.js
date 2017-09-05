@@ -25,6 +25,11 @@ class UsersController {
      * @memberOf UsersController
      */
   static createUser(req, res) {
+    if (typeof req.body.fullName !== 'string') {
+      return res.status(400).send({
+        message: 'fullName cannot be a number.'
+      });
+    }
     req.checkBody('fullName', 'fullName field is required.').notEmpty();
     req.checkBody('email', 'email field is required.').notEmpty();
     req.checkBody('email', 'Please enter a valid email.').isEmail();
@@ -34,7 +39,7 @@ class UsersController {
     User.findOne({ where: { email: req.body.email } })
       .then((existingUser) => {
         if (existingUser) {
-          return res.status(400).send({
+          return res.status(409).send({
             message: 'User already exists!',
           });
         }
@@ -73,6 +78,11 @@ class UsersController {
    * @memberOf UsersController
    */
   static login(req, res) {
+    if (typeof req.body.password !== 'string') {
+      return res.status(400).send({
+        message: 'password should be a string of letters and/or numbers.'
+      });
+    }
     req.checkBody('email', 'email field is required.').notEmpty();
     req.checkBody('password', 'password field is required.').notEmpty();
     req.checkBody('email', 'Please enter a valid email.').isEmail();
